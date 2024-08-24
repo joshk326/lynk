@@ -2,7 +2,6 @@ import 'package:app/Constants/theme.dart';
 import 'package:app/Screens/home.dart';
 import 'package:app/Screens/settings.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 
 class Navigation extends StatefulWidget {
   const Navigation({super.key});
