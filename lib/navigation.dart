@@ -26,17 +26,34 @@ class _NavigationState extends State<Navigation> {
                 _currentIndex = index;
               });
             },
+            backgroundColor: flatBlack,
+            selectedLabelTextStyle: TextStyle(color: white),
+            useIndicator: true,
+            indicatorColor: lightGreen,
             labelType: NavigationRailLabelType.selected,
             destinations: [
               NavigationRailDestination(
-                icon: const Icon(Icons.home_outlined),
-                selectedIcon: const Icon(Icons.home_filled),
-                indicatorColor: lightGreen,
-                label: const Text('Home'),
+                icon: Icon(
+                  Icons.home_outlined,
+                  color: lightGreen,
+                ),
+                selectedIcon: Icon(
+                  Icons.home_filled,
+                  color: darkGreen,
+                ),
+                label: const Text(
+                  'Home',
+                ),
               ),
               NavigationRailDestination(
-                icon: const Icon(Icons.settings_outlined),
-                selectedIcon: const Icon(Icons.settings),
+                icon: Icon(
+                  Icons.settings_outlined,
+                  color: lightGreen,
+                ),
+                selectedIcon: Icon(
+                  Icons.settings,
+                  color: darkGreen,
+                ),
                 indicatorColor: lightGreen,
                 label: const Text('Settings'),
               )
