@@ -1,3 +1,4 @@
+import 'package:app/Constants/theme.dart';
 import 'package:app/navigation.dart';
 import 'package:flutter/material.dart';
 import 'package:window_manager/window_manager.dart';
@@ -28,10 +29,11 @@ class App extends StatelessWidget {
   const App({super.key});
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
+    return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'App',
-      home: Navigation(),
+      theme: appTheme,
+      home: const Navigation(),
     );
   }
 }

@@ -2,6 +2,7 @@ import 'package:app/Constants/theme.dart';
 import 'package:app/Screens/home.dart';
 import 'package:app/Screens/settings.dart';
 import 'package:flutter/material.dart';
+import 'dart:io' show Platform;
 
 class Navigation extends StatefulWidget {
   const Navigation({super.key});
@@ -13,8 +14,8 @@ class Navigation extends StatefulWidget {
 class _NavigationState extends State<Navigation> {
   int _currentIndex = 0;
   final screens = [const Home(), const Settings()];
-  bool _navHidden = false;
-  double _navWidth = 200;
+  bool _navHidden = Platform.isIOS || Platform.isAndroid ? true : false;
+  double _navWidth = Platform.isIOS || Platform.isAndroid ? 50 : 200;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -35,13 +36,20 @@ class _NavigationState extends State<Navigation> {
                       child: Column(
                         children: [
                           // Company Logo
-                          Image.network(
-                            "https://koontzcoding.com/images/logo",
+                          Container(
+                            color: background,
+                            width: double.infinity,
+                            height: 150,
+                            margin: const EdgeInsets.only(bottom: 20),
+                            child: Image.network(
+                              "https://koontzcoding.com/images/logo",
+                            ),
                           ),
                           IconButton(
                             onPressed: () {
                               screenChange(0);
                             },
+                            iconSize: 30,
                             icon: Icon(
                               Icons.home,
                               color:
@@ -52,6 +60,7 @@ class _NavigationState extends State<Navigation> {
                             onPressed: () {
                               screenChange(1);
                             },
+                            iconSize: 30,
                             icon: Icon(
                               Icons.settings,
                               color:
@@ -62,7 +71,7 @@ class _NavigationState extends State<Navigation> {
                       ),
                     ),
                     SizedBox(
-                      height: _navHidden ? height / 2 : height - 330,
+                      height: _navHidden ? height / 2 : height - 320,
                     ),
                     IconButton(
                       onPressed: () {
