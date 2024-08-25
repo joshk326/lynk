@@ -22,12 +22,6 @@ ThemeData appTheme = ThemeData(
     appBarTheme: AppBarTheme(
       backgroundColor: background,
     ),
-    bottomNavigationBarTheme: BottomNavigationBarThemeData(
-        backgroundColor: Colors.transparent,
-        selectedItemColor: darkGreen,
-        unselectedItemColor: lightGreen,
-        elevation: 0,
-        type: BottomNavigationBarType.fixed),
     hoverColor: lightGrey,
     floatingActionButtonTheme: FloatingActionButtonThemeData(
         backgroundColor: darkGreen, foregroundColor: white));
