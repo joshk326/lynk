@@ -15,7 +15,7 @@ class _NavigationState extends State<Navigation> {
   int _currentIndex = 0;
   final screens = [const Home(), const Settings()];
   bool _navHidden = Platform.isIOS || Platform.isAndroid ? true : false;
-  double _navWidth = Platform.isIOS || Platform.isAndroid ? 50 : 200;
+  double _navWidth = Platform.isIOS || Platform.isAndroid ? 30 : 200;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -35,14 +35,27 @@ class _NavigationState extends State<Navigation> {
                       visible: !_navHidden,
                       child: Column(
                         children: [
+                          Visibility(
+                            visible: Platform.isIOS || Platform.isAndroid
+                                ? true
+                                : false,
+                            child: SizedBox(
+                              height: height / 10,
+                            ),
+                          ),
                           // Company Logo
-                          Container(
-                            color: background,
-                            width: double.infinity,
-                            height: 150,
-                            margin: const EdgeInsets.only(bottom: 20),
-                            child: Image.network(
-                              "https://koontzcoding.com/images/logo",
+                          Visibility(
+                            visible: Platform.isIOS || Platform.isAndroid
+                                ? false
+                                : true,
+                            child: Container(
+                              color: background,
+                              width: double.infinity,
+                              height: 150,
+                              margin: const EdgeInsets.only(bottom: 20),
+                              child: Image.network(
+                                "https://koontzcoding.com/images/logo",
+                              ),
                             ),
                           ),
                           IconButton(
@@ -71,7 +84,11 @@ class _NavigationState extends State<Navigation> {
                       ),
                     ),
                     SizedBox(
-                      height: _navHidden ? height / 2 : height - 320,
+                      height: _navHidden
+                          ? height / 2
+                          : Platform.isIOS || Platform.isAndroid
+                              ? height / 1.5
+                              : height - 320,
                     ),
                     IconButton(
                       onPressed: () {
@@ -79,9 +96,11 @@ class _NavigationState extends State<Navigation> {
                           _navHidden = !_navHidden;
 
                           if (_navHidden) {
-                            _navWidth = 50;
+                            _navWidth =
+                                Platform.isIOS || Platform.isAndroid ? 30 : 50;
                           } else {
-                            _navWidth = 200;
+                            _navWidth =
+                                Platform.isIOS || Platform.isAndroid ? 50 : 200;
                           }
                         });
                       },
@@ -90,6 +109,11 @@ class _NavigationState extends State<Navigation> {
                             ? Icons.keyboard_double_arrow_left
                             : Icons.keyboard_double_arrow_right,
                         color: lightGreen,
+                        size: Platform.isIOS || Platform.isAndroid
+                            ? _navHidden
+                                ? 15
+                                : 30
+                            : 30,
                       ),
                     ),
                   ],
