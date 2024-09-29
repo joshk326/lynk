@@ -39,6 +39,7 @@ class Client {
     _connected = true;
     print("Connected to ${_socket.remoteAddress}:${_socket.remotePort}");
 
+    // Sender client name back to server
     _socket.write(_name);
 
     _socket.listen(

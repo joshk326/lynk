@@ -1,5 +1,6 @@
 import 'package:app/Constants/theme.dart';
-import 'package:app/Screens/home.dart';
+import 'package:app/Screens/client_dashboard.dart';
+import 'package:app/Screens/server_dashboard.dart';
 import 'package:app/Screens/settings.dart';
 import 'package:flutter/material.dart';
 import 'dart:io' show Platform;
@@ -13,7 +14,11 @@ class Navigation extends StatefulWidget {
 
 class _NavigationState extends State<Navigation> {
   int _currentIndex = 0;
-  final screens = [const Home(), const Settings()];
+  final screens = [
+    const ServerDashboard(),
+    const ClientDashboard(),
+    const Settings()
+  ];
   bool _navHidden = Platform.isIOS || Platform.isAndroid ? true : false;
   double _navWidth = Platform.isIOS || Platform.isAndroid ? 30 : 200;
   @override
@@ -49,12 +54,12 @@ class _NavigationState extends State<Navigation> {
                                 ? false
                                 : true,
                             child: Container(
-                              color: background,
+                              color: Colors.transparent,
                               width: double.infinity,
                               height: 150,
                               margin: const EdgeInsets.only(bottom: 20),
                               child: Image.network(
-                                "https://koontzcoding.com/images/logo",
+                                "https://m.economictimes.com/thumb/height-450,width-600,imgsize-99562,msid-60988845/the-story-of-chinese-panda-and-its-diplomatic-strength.jpg",
                               ),
                             ),
                           ),
@@ -64,7 +69,7 @@ class _NavigationState extends State<Navigation> {
                             },
                             iconSize: 30,
                             icon: Icon(
-                              Icons.home,
+                              Icons.router,
                               color:
                                   _currentIndex == 0 ? darkGreen : lightGreen,
                             ),
@@ -75,9 +80,20 @@ class _NavigationState extends State<Navigation> {
                             },
                             iconSize: 30,
                             icon: Icon(
-                              Icons.settings,
+                              Icons.connect_without_contact,
                               color:
                                   _currentIndex == 1 ? darkGreen : lightGreen,
+                            ),
+                          ),
+                          IconButton(
+                            onPressed: () {
+                              screenChange(2);
+                            },
+                            iconSize: 30,
+                            icon: Icon(
+                              Icons.settings,
+                              color:
+                                  _currentIndex == 2 ? darkGreen : lightGreen,
                             ),
                           )
                         ],
@@ -88,7 +104,7 @@ class _NavigationState extends State<Navigation> {
                           ? height / 2
                           : Platform.isIOS || Platform.isAndroid
                               ? height / 1.5
-                              : height - 320,
+                              : height - 370,
                     ),
                     IconButton(
                       onPressed: () {

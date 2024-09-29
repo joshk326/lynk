@@ -6,22 +6,44 @@ Color white = const Color.fromARGB(255, 255, 255, 255);
 Color background = const Color(0xfffffeea);
 Color lightGreen = const Color.fromARGB(255, 188, 202, 173);
 Color darkGreen = const Color(0xff729B79);
+Color flatRed = const Color.fromARGB(255, 230, 101, 92);
 
 ThemeData appTheme = ThemeData(
     primaryColor: darkGreen,
     scaffoldBackgroundColor: background,
     highlightColor: lightGreen,
+    textSelectionTheme: TextSelectionThemeData(
+        selectionColor: lightGreen, cursorColor: flatBlack),
     elevatedButtonTheme: ElevatedButtonThemeData(
         style: ButtonStyle(
             backgroundColor: WidgetStatePropertyAll(darkGreen),
             foregroundColor: WidgetStatePropertyAll(background),
             shape: const WidgetStatePropertyAll(RoundedRectangleBorder(
                 borderRadius: BorderRadius.all(Radius.circular(5)))))),
-    scrollbarTheme:
-        ScrollbarThemeData(thumbColor: WidgetStatePropertyAll(darkGreen)),
+    inputDecorationTheme: InputDecorationTheme(
+        labelStyle: TextStyle(color: flatBlack),
+        focusColor: darkGreen,
+        focusedBorder:
+            UnderlineInputBorder(borderSide: BorderSide(color: darkGreen))),
+    scrollbarTheme: ScrollbarThemeData(
+        thumbColor: WidgetStatePropertyAll(darkGreen),
+        thumbVisibility: const WidgetStatePropertyAll(true)),
     appBarTheme: AppBarTheme(
+      backgroundColor: background,
+    ),
+    textButtonTheme: TextButtonThemeData(
+        style: ButtonStyle(
+            foregroundColor: WidgetStatePropertyAll(flatBlack),
+            overlayColor: WidgetStatePropertyAll(lightGreen))),
+    dialogTheme: DialogTheme(
       backgroundColor: background,
     ),
     hoverColor: lightGrey,
     floatingActionButtonTheme: FloatingActionButtonThemeData(
-        backgroundColor: darkGreen, foregroundColor: white));
+        backgroundColor: darkGreen, foregroundColor: white),
+    switchTheme: SwitchThemeData(
+        trackColor: WidgetStateProperty.resolveWith((states) {
+          return states.contains(WidgetState.selected) ? lightGreen : flatRed;
+        }),
+        overlayColor: WidgetStatePropertyAll(darkGreen.withAlpha(10)),
+        thumbColor: WidgetStatePropertyAll(background)));
