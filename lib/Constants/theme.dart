@@ -46,4 +46,10 @@ ThemeData appTheme = ThemeData(
           return states.contains(WidgetState.selected) ? lightGreen : flatRed;
         }),
         overlayColor: WidgetStatePropertyAll(darkGreen.withAlpha(10)),
-        thumbColor: WidgetStatePropertyAll(background)));
+        thumbColor: WidgetStatePropertyAll(background)),
+    bottomSheetTheme: BottomSheetThemeData(
+        modalBackgroundColor: flatBlack,
+        modalBarrierColor: flatBlack,
+        backgroundColor: lightGreen,
+        elevation: 1,
+        shadowColor: flatBlack));

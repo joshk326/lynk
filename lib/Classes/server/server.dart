@@ -95,6 +95,10 @@ class Server {
     return _consoleOutput;
   }
 
+  Map<Socket, String> getClients() {
+    return _clients;
+  }
+
   void start() {
     _running = true;
     _createSocket();

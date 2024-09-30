@@ -11,7 +11,7 @@ void main() async {
 
     WindowOptions windowOptions = const WindowOptions(
         center: true,
-        minimumSize: Size(900, 800),
+        minimumSize: Size(1000, 800),
         backgroundColor: Colors.transparent,
         skipTaskbar: false,
         titleBarStyle: TitleBarStyle.normal,

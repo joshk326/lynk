@@ -1,3 +1,6 @@
+import 'dart:collection';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -16,6 +19,8 @@ String consoleOutput = "";
 Icon serverBtnIcon = const Icon(Icons.play_arrow);
 Color serverBtnColor = darkGreen;
 bool showConsole = false;
+bool clientsShown = false;
+Map<Socket, String> clients = {};
 
 class ServerDashboard extends StatefulWidget {
   const ServerDashboard({super.key});
@@ -34,125 +39,205 @@ class _ServerDashboardState extends State<ServerDashboard> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(50),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Container(
-            constraints: const BoxConstraints(maxWidth: 800),
-            padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 50),
-            decoration: BoxDecoration(
-                color: background,
-                border: Border.all(color: flatBlack),
-                borderRadius: const BorderRadius.all(Radius.circular(20))),
-            child: Column(
+    return Scaffold(
+      floatingActionButton: Visibility(
+          visible: serverRunning,
+          child: FloatingActionButton(
+            backgroundColor: !clientsShown
+                ? Theme.of(context).floatingActionButtonTheme.backgroundColor
+                : flatRed,
+            onPressed: () {
+              setState(() {
+                clientsShown = !clientsShown;
+              });
+            },
+            child: !clientsShown
+                ? const Icon(Icons.person)
+                : const Icon(Icons.close),
+          )),
+      body: Center(
+        child: Stack(
+          alignment: AlignmentDirectional.center,
+          children: [
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                TextField(
-                  controller: ipTxtContr,
-                  maxLength: 15,
-                  decoration:
-                      const InputDecoration(labelText: "IP", counterText: ""),
-                  onChanged: (value) {
-                    setState(() {
-                      ipInput = value;
-                    });
-                  },
-                ),
-                TextField(
-                  controller: portTxtContr,
-                  maxLength: 5,
-                  decoration:
-                      const InputDecoration(labelText: "Port", counterText: ""),
-                  inputFormatters: <TextInputFormatter>[
-                    FilteringTextInputFormatter.digitsOnly
-                  ],
-                  onChanged: (value) {
-                    setState(() {
-                      portInput = value;
-                    });
-                  },
+                Container(
+                  constraints: const BoxConstraints(maxWidth: 650),
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 20, horizontal: 50),
+                  decoration: BoxDecoration(
+                      color: background,
+                      border: Border.all(color: flatBlack),
+                      borderRadius:
+                          const BorderRadius.all(Radius.circular(20))),
+                  child: Column(
+                    children: [
+                      TextField(
+                        controller: ipTxtContr,
+                        maxLength: 15,
+                        decoration: const InputDecoration(
+                            labelText: "IP", counterText: ""),
+                        onChanged: (value) {
+                          setState(() {
+                            ipInput = value;
+                          });
+                        },
+                      ),
+                      TextField(
+                        controller: portTxtContr,
+                        maxLength: 5,
+                        decoration: const InputDecoration(
+                            labelText: "Port", counterText: ""),
+                        inputFormatters: <TextInputFormatter>[
+                          FilteringTextInputFormatter.digitsOnly
+                        ],
+                        onChanged: (value) {
+                          setState(() {
+                            portInput = value;
+                          });
+                        },
+                      ),
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      IconButton(
+                        icon: serverBtnIcon,
+                        color: serverBtnColor,
+                        onPressed: () => runServer(),
+                      ),
+                    ],
+                  ),
                 ),
                 const SizedBox(
                   height: 20,
                 ),
-                IconButton(
-                  icon: serverBtnIcon,
-                  color: serverBtnColor,
-                  onPressed: () => runServer(),
+                Visibility(
+                  visible: serverRunning,
+                  child: Wrap(
+                    spacing: 5,
+                    children: [
+                      const Padding(
+                        padding: EdgeInsets.only(top: 10),
+                        child: Text("Show Console"),
+                      ),
+                      Switch(
+                          value: showConsole,
+                          onChanged: (context) {
+                            setState(() {
+                              showConsole = !showConsole;
+                            });
+                          }),
+                    ],
+                  ),
+                ),
+                Visibility(
+                  visible: showConsole,
+                  child: StreamBuilder(
+                      stream: Stream.periodic(const Duration(seconds: 1))
+                          .asyncMap((i) => getConsoleData()),
+                      builder: (context, snapshot) {
+                        var data = snapshot.data;
+                        if (serverRunning && (data != null)) {
+                          for (String item in data) {
+                            if (!consoleOutput.contains(item)) {
+                              consoleOutput = "$consoleOutput\n$item";
+                            }
+                          }
+                        } else {
+                          consoleOutput = "";
+                        }
+                        return Container(
+                            height: 200,
+                            width: 650,
+                            padding: const EdgeInsets.all(20),
+                            decoration: BoxDecoration(
+                                border: Border.all(color: flatBlack),
+                                borderRadius: const BorderRadius.all(
+                                    Radius.circular(20))),
+                            child: Column(
+                              children: [
+                                Text(
+                                  "Console Output",
+                                  style: TextStyle(
+                                    color: darkGreen,
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                Expanded(
+                                    child: SingleChildScrollView(
+                                        padding:
+                                            const EdgeInsets.only(right: 20),
+                                        child: Text(consoleOutput))),
+                              ],
+                            ));
+                      }),
                 ),
               ],
             ),
-          ),
-          const SizedBox(
-            height: 20,
-          ),
-          Visibility(
-            visible: serverRunning,
-            child: Wrap(
-              children: [
-                const Align(
-                    widthFactor: 7.8,
-                    heightFactor: 1.5,
-                    alignment: Alignment.bottomRight,
-                    child: Text("Show Console")),
-                Align(
-                  widthFactor: 1.2,
-                  alignment: Alignment.centerRight,
-                  child: Switch(
-                      value: showConsole,
-                      onChanged: (context) {
-                        setState(() {
-                          showConsole = !showConsole;
-                        });
-                      }),
-                )
-              ],
-            ),
-          ),
-          Visibility(
-            visible: showConsole,
-            child: StreamBuilder(
-                stream: Stream.periodic(const Duration(seconds: 1))
-                    .asyncMap((i) => getConsoleData()),
-                builder: (context, snapshot) {
-                  var data = snapshot.data;
-                  if (serverRunning && (data != null)) {
-                    for (String item in data) {
-                      if (!consoleOutput.contains(item)) {
-                        consoleOutput = "$consoleOutput\n$item";
-                      }
-                    }
-                  } else {
-                    consoleOutput = "";
-                  }
-                  return Container(
-                      height: 200,
-                      width: 800,
-                      padding: const EdgeInsets.all(20),
-                      decoration: BoxDecoration(
-                          border: Border.all(color: flatBlack),
-                          borderRadius:
-                              const BorderRadius.all(Radius.circular(20))),
-                      child: Column(
-                        children: [
-                          Text(
-                            "Console Output",
-                            style: TextStyle(
-                              color: darkGreen,
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          Expanded(
-                              child: SingleChildScrollView(
-                                  padding: const EdgeInsets.only(right: 20),
-                                  child: Text(consoleOutput))),
-                        ],
-                      ));
-                }),
-          ),
-        ],
+            Visibility(
+              visible: clientsShown,
+              child: Container(
+                  width: double.infinity,
+                  height: double.infinity,
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: flatBlack.withAlpha(98),
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Expanded(
+                        child: FutureBuilder(
+                            future: getClients(),
+                            builder: (context, snapshot) {
+                              if (serverRunning && clients.isNotEmpty) {
+                                return Center(
+                                  child: Container(
+                                    padding: const EdgeInsets.all(20),
+                                    constraints: const BoxConstraints(maxHeight: 300),
+                                    decoration: BoxDecoration(
+                                        color: background,
+                                        borderRadius: const BorderRadius.all(
+                                            Radius.circular(20))),
+                                    child: ListView.builder(
+                                      itemCount: clients.length,
+                                      itemBuilder: (context, index) {
+                                        return ListTile(
+                                          leading: const Icon(Icons.person),
+                                          title: Text(
+                                              clients.values.elementAt(index)),
+                                          subtitle: Text(
+                                              "${clients.keys.elementAt(index).remoteAddress.address}:${clients.keys.elementAt(index).remotePort}"),
+                                          trailing: Text(
+                                              "${clients.keys.elementAt(index).remoteAddress.type}"),
+                                        );
+                                        // Text(
+                                        //   "Name: ${clients.values.elementAt(index)}, Address: ${clients.keys.elementAt(index).address.address}: ${clients.keys.elementAt(index).port}");
+                                      },
+                                    ),
+                                  ),
+                                );
+                              } else {
+                                return Center(
+                                  child: Container(
+                                      padding: const EdgeInsets.all(20),
+                                      decoration: BoxDecoration(
+                                          color: background,
+                                          borderRadius: const BorderRadius.all(
+                                              Radius.circular(20))),
+                                      child:
+                                          const Text("No clients connected")),
+                                );
+                              }
+                            }),
+                      ),
+                    ],
+                  )),
+            )
+          ],
+        ),
       ),
     );
   }
@@ -179,6 +264,7 @@ class _ServerDashboardState extends State<ServerDashboard> {
       setState(() {
         serverBtnIcon = const Icon(Icons.play_arrow);
         serverBtnColor = darkGreen;
+        clients.clear();
       });
       if (!checkConsoleError()) {
         setState(() {
@@ -205,5 +291,11 @@ class _ServerDashboardState extends State<ServerDashboard> {
       retVal = [""];
     }
     return retVal;
+  }
+
+  Future<void> getClients() async {
+    if (serverRunning) {
+      clients = server!.getClients();
+    }
   }
 }

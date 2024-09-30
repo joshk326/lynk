@@ -10,6 +10,6 @@ class ClientDashboard extends StatefulWidget {
 class _ClientDashboardState extends State<ClientDashboard> {
   @override
   Widget build(BuildContext context) {
-    return const Text("Client");
+    return const Scaffold(body: Center(child: Text("Client")));
   }
 }

@@ -5,6 +5,9 @@ import 'package:app/Screens/settings.dart';
 import 'package:flutter/material.dart';
 import 'dart:io' show Platform;
 
+double desktopNavWidth = 200;
+double desktopNavClsoed = 50;
+
 class Navigation extends StatefulWidget {
   const Navigation({super.key});
 
@@ -19,8 +22,10 @@ class _NavigationState extends State<Navigation> {
     const ClientDashboard(),
     const Settings()
   ];
+
   bool _navHidden = Platform.isIOS || Platform.isAndroid ? true : false;
-  double _navWidth = Platform.isIOS || Platform.isAndroid ? 30 : 200;
+  double _navWidth =
+      Platform.isIOS || Platform.isAndroid ? 30 : desktopNavWidth;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -58,9 +63,8 @@ class _NavigationState extends State<Navigation> {
                               width: double.infinity,
                               height: 150,
                               margin: const EdgeInsets.only(bottom: 20),
-                              child: Image.network(
-                                "https://m.economictimes.com/thumb/height-450,width-600,imgsize-99562,msid-60988845/the-story-of-chinese-panda-and-its-diplomatic-strength.jpg",
-                              ),
+                              child: const Image(
+                                  image: AssetImage('assets/images/logo.png')),
                             ),
                           ),
                           IconButton(
@@ -112,11 +116,13 @@ class _NavigationState extends State<Navigation> {
                           _navHidden = !_navHidden;
 
                           if (_navHidden) {
-                            _navWidth =
-                                Platform.isIOS || Platform.isAndroid ? 30 : 50;
+                            _navWidth = Platform.isIOS || Platform.isAndroid
+                                ? 30
+                                : desktopNavClsoed;
                           } else {
-                            _navWidth =
-                                Platform.isIOS || Platform.isAndroid ? 50 : 200;
+                            _navWidth = Platform.isIOS || Platform.isAndroid
+                                ? 50
+                                : desktopNavWidth = 200;
                           }
                         });
                       },
