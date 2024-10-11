@@ -1,7 +1,9 @@
 import 'package:app/Constants/theme.dart';
+import 'package:app/Constants/variables.dart';
 import 'package:app/Screens/client_dashboard.dart';
 import 'package:app/Screens/server_dashboard.dart';
 import 'package:app/Screens/settings.dart';
+import 'package:app/Widgets/alert.dart';
 import 'package:flutter/material.dart';
 import 'dart:io' show Platform;
 
@@ -80,7 +82,10 @@ class _NavigationState extends State<Navigation> {
                           ),
                           IconButton(
                             onPressed: () {
-                              screenChange(1);
+                              serverRunning
+                                  ? createDialogPopUp(context, "Lynk",
+                                      "Unable to access client dashboard while server is running")
+                                  : screenChange(1);
                             },
                             iconSize: 30,
                             icon: Icon(

@@ -1,6 +1,6 @@
-import 'dart:collection';
 import 'dart:io';
 
+import 'package:app/Constants/variables.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -10,17 +10,18 @@ import 'package:app/Constants/theme.dart';
 import 'package:app/Widgets/alert.dart';
 
 // Global variables
-String ipInput = "";
-String portInput = "";
-bool serverRunning = false;
-Address? serverAddr;
-Server? server;
-String consoleOutput = "";
-Icon serverBtnIcon = const Icon(Icons.play_arrow);
-Color serverBtnColor = darkGreen;
-bool showConsole = false;
-bool clientsShown = false;
-Map<Socket, String> clients = {};
+String _ipInput = "";
+String _portInput = "";
+Address? _serverAddr;
+Server? _server;
+String _consoleOutput = "";
+Icon _serverBtnIcon = const Icon(Icons.play_arrow);
+Color _serverBtnColor = darkGreen;
+bool _showConsole = false;
+bool _clientsShown = false;
+bool _messagesShown = false;
+Map<Socket, String> _clients = {};
+List<Message> _serverMessages = [];
 
 class ServerDashboard extends StatefulWidget {
   const ServerDashboard({super.key});
@@ -31,11 +32,11 @@ class ServerDashboard extends StatefulWidget {
 
 class _ServerDashboardState extends State<ServerDashboard> {
   var ipTxtContr = TextEditingController(
-    text: ipInput.isNotEmpty ? ipInput : "",
+    text: _ipInput.isNotEmpty ? _ipInput : "",
   );
 
   var portTxtContr =
-      TextEditingController(text: portInput.isNotEmpty ? portInput : "");
+      TextEditingController(text: _portInput.isNotEmpty ? _portInput : "");
 
   @override
   Widget build(BuildContext context) {
@@ -43,15 +44,18 @@ class _ServerDashboardState extends State<ServerDashboard> {
       floatingActionButton: Visibility(
           visible: serverRunning,
           child: FloatingActionButton(
-            backgroundColor: !clientsShown
+            backgroundColor: !_clientsShown
                 ? Theme.of(context).floatingActionButtonTheme.backgroundColor
                 : flatRed,
             onPressed: () {
               setState(() {
-                clientsShown = !clientsShown;
+                if (_messagesShown) {
+                  _messagesShown = !_messagesShown;
+                }
+                _clientsShown = !_clientsShown;
               });
             },
-            child: !clientsShown
+            child: !_clientsShown
                 ? const Icon(Icons.person)
                 : const Icon(Icons.close),
           )),
@@ -59,125 +63,128 @@ class _ServerDashboardState extends State<ServerDashboard> {
         child: Stack(
           alignment: AlignmentDirectional.center,
           children: [
-            Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Container(
-                  constraints: const BoxConstraints(maxWidth: 650),
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 20, horizontal: 50),
-                  decoration: BoxDecoration(
-                      color: background,
-                      border: Border.all(color: flatBlack),
-                      borderRadius:
-                          const BorderRadius.all(Radius.circular(20))),
-                  child: Column(
-                    children: [
-                      TextField(
-                        controller: ipTxtContr,
-                        maxLength: 15,
-                        decoration: const InputDecoration(
-                            labelText: "IP", counterText: ""),
-                        onChanged: (value) {
-                          setState(() {
-                            ipInput = value;
-                          });
-                        },
-                      ),
-                      TextField(
-                        controller: portTxtContr,
-                        maxLength: 5,
-                        decoration: const InputDecoration(
-                            labelText: "Port", counterText: ""),
-                        inputFormatters: <TextInputFormatter>[
-                          FilteringTextInputFormatter.digitsOnly
-                        ],
-                        onChanged: (value) {
-                          setState(() {
-                            portInput = value;
-                          });
-                        },
-                      ),
-                      const SizedBox(
-                        height: 20,
-                      ),
-                      IconButton(
-                        icon: serverBtnIcon,
-                        color: serverBtnColor,
-                        onPressed: () => runServer(),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(
-                  height: 20,
-                ),
-                Visibility(
-                  visible: serverRunning,
-                  child: Wrap(
-                    spacing: 5,
-                    children: [
-                      const Padding(
-                        padding: EdgeInsets.only(top: 10),
-                        child: Text("Show Console"),
-                      ),
-                      Switch(
-                          value: showConsole,
-                          onChanged: (context) {
+            SingleChildScrollView(
+              padding: const EdgeInsets.only(right: 20),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    constraints: const BoxConstraints(maxWidth: 650),
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 20, horizontal: 50),
+                    decoration: BoxDecoration(
+                        color: background,
+                        border: Border.all(color: flatBlack),
+                        borderRadius:
+                            const BorderRadius.all(Radius.circular(20))),
+                    child: Column(
+                      children: [
+                        TextField(
+                          controller: ipTxtContr,
+                          maxLength: 15,
+                          decoration: const InputDecoration(
+                              labelText: "IP", counterText: ""),
+                          onChanged: (value) {
                             setState(() {
-                              showConsole = !showConsole;
+                              _ipInput = value;
                             });
-                          }),
-                    ],
+                          },
+                        ),
+                        TextField(
+                          controller: portTxtContr,
+                          maxLength: 5,
+                          decoration: const InputDecoration(
+                              labelText: "Port", counterText: ""),
+                          inputFormatters: <TextInputFormatter>[
+                            FilteringTextInputFormatter.digitsOnly
+                          ],
+                          onChanged: (value) {
+                            setState(() {
+                              _portInput = value;
+                            });
+                          },
+                        ),
+                        const SizedBox(
+                          height: 20,
+                        ),
+                        IconButton(
+                          icon: _serverBtnIcon,
+                          color: _serverBtnColor,
+                          onPressed: () => _runServer(),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-                Visibility(
-                  visible: showConsole,
-                  child: StreamBuilder(
-                      stream: Stream.periodic(const Duration(seconds: 1))
-                          .asyncMap((i) => getConsoleData()),
-                      builder: (context, snapshot) {
-                        var data = snapshot.data;
-                        if (serverRunning && (data != null)) {
-                          for (String item in data) {
-                            if (!consoleOutput.contains(item)) {
-                              consoleOutput = "$consoleOutput\n$item";
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  Visibility(
+                    visible: serverRunning,
+                    child: Wrap(
+                      spacing: 5,
+                      children: [
+                        const Padding(
+                          padding: EdgeInsets.only(top: 10),
+                          child: Text("Show Console"),
+                        ),
+                        Switch(
+                            value: _showConsole,
+                            onChanged: (context) {
+                              setState(() {
+                                _showConsole = !_showConsole;
+                              });
+                            }),
+                      ],
+                    ),
+                  ),
+                  Visibility(
+                    visible: _showConsole,
+                    child: StreamBuilder(
+                        stream: Stream.periodic(const Duration(seconds: 1))
+                            .asyncMap((i) => _getConsoleData()),
+                        builder: (context, snapshot) {
+                          var data = snapshot.data;
+                          if (serverRunning && (data != null)) {
+                            for (String item in data) {
+                              if (!_consoleOutput.contains(item)) {
+                                _consoleOutput = "$_consoleOutput\n$item";
+                              }
                             }
+                          } else {
+                            _consoleOutput = "";
                           }
-                        } else {
-                          consoleOutput = "";
-                        }
-                        return Container(
-                            height: 200,
-                            width: 650,
-                            padding: const EdgeInsets.all(20),
-                            decoration: BoxDecoration(
-                                border: Border.all(color: flatBlack),
-                                borderRadius: const BorderRadius.all(
-                                    Radius.circular(20))),
-                            child: Column(
-                              children: [
-                                Text(
-                                  "Console Output",
-                                  style: TextStyle(
-                                    color: darkGreen,
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.bold,
+                          return Container(
+                              height: 200,
+                              width: 650,
+                              padding: const EdgeInsets.all(20),
+                              decoration: BoxDecoration(
+                                  border: Border.all(color: flatBlack),
+                                  borderRadius: const BorderRadius.all(
+                                      Radius.circular(20))),
+                              child: Column(
+                                children: [
+                                  Text(
+                                    "Console Output",
+                                    style: TextStyle(
+                                      color: darkGreen,
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold,
+                                    ),
                                   ),
-                                ),
-                                Expanded(
-                                    child: SingleChildScrollView(
-                                        padding:
-                                            const EdgeInsets.only(right: 20),
-                                        child: Text(consoleOutput))),
-                              ],
-                            ));
-                      }),
-                ),
-              ],
+                                  Expanded(
+                                      child: SingleChildScrollView(
+                                          padding:
+                                              const EdgeInsets.only(right: 20),
+                                          child: Text(_consoleOutput))),
+                                ],
+                              ));
+                        }),
+                  ),
+                ],
+              ),
             ),
             Visibility(
-              visible: clientsShown,
+              visible: _clientsShown,
               child: Container(
                   width: double.infinity,
                   height: double.infinity,
@@ -190,31 +197,30 @@ class _ServerDashboardState extends State<ServerDashboard> {
                     children: [
                       Expanded(
                         child: FutureBuilder(
-                            future: getClients(),
+                            future: _getClients(),
                             builder: (context, snapshot) {
-                              if (serverRunning && clients.isNotEmpty) {
+                              if (serverRunning && _clients.isNotEmpty) {
                                 return Center(
                                   child: Container(
                                     padding: const EdgeInsets.all(20),
-                                    constraints: const BoxConstraints(maxHeight: 300),
+                                    constraints:
+                                        const BoxConstraints(maxHeight: 300),
                                     decoration: BoxDecoration(
                                         color: background,
                                         borderRadius: const BorderRadius.all(
                                             Radius.circular(20))),
                                     child: ListView.builder(
-                                      itemCount: clients.length,
+                                      itemCount: _clients.length,
                                       itemBuilder: (context, index) {
                                         return ListTile(
                                           leading: const Icon(Icons.person),
                                           title: Text(
-                                              clients.values.elementAt(index)),
+                                              _clients.values.elementAt(index)),
                                           subtitle: Text(
-                                              "${clients.keys.elementAt(index).remoteAddress.address}:${clients.keys.elementAt(index).remotePort}"),
+                                              "${_clients.keys.elementAt(index).remoteAddress.address}:${_clients.keys.elementAt(index).remotePort}"),
                                           trailing: Text(
-                                              "${clients.keys.elementAt(index).remoteAddress.type}"),
+                                              "${_clients.keys.elementAt(index).remoteAddress.type}"),
                                         );
-                                        // Text(
-                                        //   "Name: ${clients.values.elementAt(index)}, Address: ${clients.keys.elementAt(index).address.address}: ${clients.keys.elementAt(index).port}");
                                       },
                                     ),
                                   ),
@@ -235,6 +241,95 @@ class _ServerDashboardState extends State<ServerDashboard> {
                       ),
                     ],
                   )),
+            ),
+            Visibility(
+                visible: _messagesShown,
+                child: Container(
+                    width: double.infinity,
+                    height: double.infinity,
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      color: flatBlack.withAlpha(98),
+                    ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Expanded(
+                          child: FutureBuilder(
+                              future: _getServerMessages(),
+                              builder: (context, snapshot) {
+                                if (serverRunning &&
+                                    _serverMessages.isNotEmpty) {
+                                  return Center(
+                                    child: Container(
+                                      padding: const EdgeInsets.all(20),
+                                      constraints:
+                                          const BoxConstraints(maxHeight: 300),
+                                      decoration: BoxDecoration(
+                                          color: background,
+                                          borderRadius: const BorderRadius.all(
+                                              Radius.circular(20))),
+                                      child: ListView.builder(
+                                        itemCount: _serverMessages.length,
+                                        itemBuilder: (context, index) {
+                                          return ListTile(
+                                            leading:
+                                                const Icon(Icons.file_present),
+                                            title: Text(
+                                                "From: ${_serverMessages.elementAt(index).sender}"),
+                                            subtitle: Text(_serverMessages
+                                                .elementAt(index)
+                                                .message),
+                                            trailing: IconButton(
+                                                onPressed: () {},
+                                                icon:
+                                                    const Icon(Icons.download)),
+                                          );
+                                        },
+                                      ),
+                                    ),
+                                  );
+                                } else {
+                                  return Center(
+                                    child: Container(
+                                        padding: const EdgeInsets.all(20),
+                                        decoration: BoxDecoration(
+                                            color: background,
+                                            borderRadius:
+                                                const BorderRadius.all(
+                                                    Radius.circular(20))),
+                                        child:
+                                            const Text("No files receieved")),
+                                  );
+                                }
+                              }),
+                        ),
+                      ],
+                    ))),
+            Visibility(
+              visible: serverRunning,
+              child: Align(
+                  alignment: Alignment.bottomLeft,
+                  child: Padding(
+                      padding: const EdgeInsets.all(20),
+                      child: FloatingActionButton(
+                        backgroundColor: !_messagesShown
+                            ? Theme.of(context)
+                                .floatingActionButtonTheme
+                                .backgroundColor
+                            : flatRed,
+                        onPressed: () {
+                          setState(() {
+                            if (_clientsShown) {
+                              _clientsShown = !_clientsShown;
+                            }
+                            _messagesShown = !_messagesShown;
+                          });
+                        },
+                        child: !_messagesShown
+                            ? const Icon(Icons.file_open)
+                            : const Icon(Icons.close),
+                      ))),
             )
           ],
         ),
@@ -242,33 +337,34 @@ class _ServerDashboardState extends State<ServerDashboard> {
     );
   }
 
-  void runServer() {
-    if (!serverRunning && (ipInput.isNotEmpty) && (portInput.isNotEmpty)) {
-      if ((validateIP(ipInput)) && validatePort(portInput)) {
+  void _runServer() {
+    if (!serverRunning && (_ipInput.isNotEmpty) && (_portInput.isNotEmpty)) {
+      if ((validateIP(_ipInput)) && validatePort(_portInput)) {
         setState(() {
-          serverAddr = Address(ipInput, int.parse(portInput));
-          server = Server(serverAddr!);
-          server!.start();
-          serverRunning = server!.isRunning();
-          serverBtnIcon = const Icon(Icons.stop);
-          serverBtnColor = Colors.red;
+          _serverAddr = Address(_ipInput, int.parse(_portInput));
+          _server = Server(_serverAddr!);
+          _server!.start();
+          serverRunning = _server!.isRunning();
+          _serverBtnIcon = const Icon(Icons.stop);
+          _serverBtnColor = Colors.red;
         });
       } else {
         createDialogPopUp(context, "Error", "Invalid ip or port format");
       }
-    } else if (serverRunning && server != null) {
+    } else if (serverRunning && _server != null) {
       // Do some error checking - kind of looks gross...
       setState(() {
         serverRunning = false;
       });
       setState(() {
-        serverBtnIcon = const Icon(Icons.play_arrow);
-        serverBtnColor = darkGreen;
-        clients.clear();
+        _serverBtnIcon = const Icon(Icons.play_arrow);
+        _serverBtnColor = darkGreen;
+        _clients.clear();
+        _serverMessages.clear();
       });
-      if (!checkConsoleError()) {
+      if (!_checkConsoleError()) {
         setState(() {
-          server!.stop();
+          _server!.stop();
         });
       }
     } else {
@@ -276,26 +372,32 @@ class _ServerDashboardState extends State<ServerDashboard> {
     }
   }
 
-  bool checkConsoleError() {
-    if (consoleOutput.contains(ServerErrors["CONN_ERR"]!)) {
+  bool _checkConsoleError() {
+    if (_consoleOutput.contains(ServerErrors["CONN_ERR"]!)) {
       return true;
     }
     return false;
   }
 
-  List<String> getConsoleData() {
+  List<String> _getConsoleData() {
     List<String> retVal = [];
     if (serverRunning) {
-      retVal = server!.getConsoleOutput();
+      retVal = _server!.getConsoleOutput();
     } else {
       retVal = [""];
     }
     return retVal;
   }
 
-  Future<void> getClients() async {
+  Future<void> _getClients() async {
     if (serverRunning) {
-      clients = server!.getClients();
+      _clients = _server!.getClients();
+    }
+  }
+
+  Future<void> _getServerMessages() async {
+    if (serverRunning) {
+      _serverMessages = _server!.getMessages();
     }
   }
 }

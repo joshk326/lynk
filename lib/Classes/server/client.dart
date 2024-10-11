@@ -73,7 +73,7 @@ class Client {
 
   void sendMessage(String message) {
     if (_socket != Null) {
-      _socket.write(message);
+      _socket.write("${DateTime.now()} - From: $_name, Message: '$message'");
     }
   }
 }

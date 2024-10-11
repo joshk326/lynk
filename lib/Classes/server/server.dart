@@ -50,6 +50,24 @@ class Server {
     return false;
   }
 
+  _decodeMsg(String data) {
+    RegExp regExp = RegExp(
+        r"(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{6}) - From: (\w+), Message: '(.*?)'");
+
+    // Matching the pattern in the log string
+    RegExpMatch? match = regExp.firstMatch(data);
+
+    if (match != null) {
+      String datetime = match.group(1)!;
+      String fromName = match.group(2)!;
+      String message = match.group(3)!;
+
+      return Message(DateTime.parse(datetime), fromName, message);
+    } else {
+      return Null;
+    }
+  }
+
   void _broadcastMessage(Socket sender, String message,
       [bool toSender = false]) {
     Message broadcast;
@@ -77,8 +95,13 @@ class Server {
           _clients[client] = message;
           _broadcastMessage(client, "You are logged in as: $message", true);
         }
-
-        _broadcastMessage(client, message);
+        var tmp = _decodeMsg(message);
+        if (tmp != Null) {
+          _messages.add(tmp);
+          _writeConsole("Received: $tmp");
+        }
+        // Enable if you want to send messages back out to all other clients
+        // _broadcastMessage(client, message);
       },
       onDone: () {
         _writeConsole("${client.address}:${client.remotePort} disconnected");
