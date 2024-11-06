@@ -361,6 +361,7 @@ class _ServerDashboardState extends State<ServerDashboard> {
         _serverBtnColor = darkGreen;
         _clients.clear();
         _serverMessages.clear();
+        _showConsole = false;
       });
       if (!_checkConsoleError()) {
         setState(() {
