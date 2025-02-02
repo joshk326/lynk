@@ -36,7 +36,11 @@ class Client {
   }
 
   Future<void> connect() async {
-    _socket = await Socket.connect(_host.ip(), _host.port());
+    try {
+      _socket = await Socket.connect(_host.ip(), _host.port());
+    } catch (ex) {
+      return;
+    }
     _connected = true;
     print("Connected to ${_socket.remoteAddress}:${_socket.remotePort}");
 

@@ -303,9 +303,18 @@ class _ServerDashboardState extends State<ServerDashboard> {
                                                                       int.parse)
                                                                   .toList()));
 
-                                                  if (outputFile == null) {
-                                                    // User canceled the picker
-                                                  } else {
+                                                  if (outputFile != null) {
+                                                    File(outputFile)
+                                                        .writeAsBytes(
+                                                            Uint8List.fromList(
+                                                                _serverMessages
+                                                                    .elementAt(
+                                                                        index)
+                                                                    .content
+                                                                    .split(" ")
+                                                                    .map(int
+                                                                        .parse)
+                                                                    .toList()));
                                                     createDialogPopUp(
                                                         context,
                                                         "Saved",
@@ -424,13 +433,17 @@ class _ServerDashboardState extends State<ServerDashboard> {
 
   Future<void> _getClients() async {
     if (serverRunning) {
-      _clients = _server!.getClients();
+      setState(() {
+        _clients = _server!.getClients();
+      });
     }
   }
 
   Future<void> _getServerMessages() async {
     if (serverRunning) {
-      _serverMessages = _server!.getMessages();
+      setState(() {
+        _serverMessages = _server!.getMessages();
+      });
     }
   }
 }

@@ -120,7 +120,7 @@ class _ClientDashboardState extends State<ClientDashboard> {
     ));
   }
 
-  void _connect() {
+  Future<void> _connect() async {
     if (!clientConnected &&
         (_ipInputClient.isNotEmpty) &&
         (_portInputClient.isNotEmpty)) {
@@ -128,7 +128,11 @@ class _ClientDashboardState extends State<ClientDashboard> {
         setState(() {
           _serverAddr = Address(_ipInputClient, int.parse(_portInputClient));
           _client = Client(_serverAddr!, idGenerator());
-          _client!.connect();
+        });
+
+        await _client!.connect();
+
+        setState(() {
           clientConnected = !clientConnected;
           _connectBtnIcon = const Icon(Icons.link_off);
           _connectBtnColor = Colors.red;
@@ -163,7 +167,8 @@ class _ClientDashboardState extends State<ClientDashboard> {
         title: Text(file.path),
         trailing: IconButton(
             onPressed: () {
-              _client!.sendMessage(p.basename(file.path), bytes.toString().replaceAll(RegExp(r'[\[\],]'), ''));
+              _client!.sendMessage(p.basename(file.path),
+                  bytes.toString().replaceAll(RegExp(r'[\[\],]'), ''));
               createDialogPopUp(context, "Sent", "File sent to server!");
             },
             icon: const Icon(Icons.send)),
