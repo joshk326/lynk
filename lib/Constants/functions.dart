@@ -39,3 +39,8 @@ bool validatePort(var input) {
 bool isNumeric(String s) {
   return double.tryParse(s) != null;
 }
+
+String idGenerator() {
+  final now = DateTime.now();
+  return now.microsecondsSinceEpoch.toString();
+}

@@ -71,7 +71,10 @@ class _NavigationState extends State<Navigation> {
                           ),
                           IconButton(
                             onPressed: () {
-                              screenChange(0);
+                              clientConnected
+                                  ? createDialogPopUp(context, "Lynk",
+                                      "Unable to access server dashboard while client is connected")
+                                  : screenChange(0);
                             },
                             iconSize: 30,
                             icon: Icon(

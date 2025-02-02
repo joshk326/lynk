@@ -10,8 +10,8 @@ import 'package:app/Constants/theme.dart';
 import 'package:app/Widgets/alert.dart';
 
 // Global variables
-String _ipInput = "";
-String _portInput = "";
+String _ipInputServer = "";
+String _portInputServer = "";
 Address? _serverAddr;
 Server? _server;
 String _consoleOutput = "";
@@ -32,11 +32,11 @@ class ServerDashboard extends StatefulWidget {
 
 class _ServerDashboardState extends State<ServerDashboard> {
   var ipTxtContr = TextEditingController(
-    text: _ipInput.isNotEmpty ? _ipInput : "",
+    text: _ipInputServer.isNotEmpty ? _ipInputServer : "",
   );
 
-  var portTxtContr =
-      TextEditingController(text: _portInput.isNotEmpty ? _portInput : "");
+  var portTxtContr = TextEditingController(
+      text: _portInputServer.isNotEmpty ? _portInputServer : "");
 
   @override
   Widget build(BuildContext context) {
@@ -86,7 +86,7 @@ class _ServerDashboardState extends State<ServerDashboard> {
                               labelText: "IP", counterText: ""),
                           onChanged: (value) {
                             setState(() {
-                              _ipInput = value;
+                              _ipInputServer = value;
                             });
                           },
                         ),
@@ -100,7 +100,7 @@ class _ServerDashboardState extends State<ServerDashboard> {
                           ],
                           onChanged: (value) {
                             setState(() {
-                              _portInput = value;
+                              _portInputServer = value;
                             });
                           },
                         ),
@@ -338,10 +338,12 @@ class _ServerDashboardState extends State<ServerDashboard> {
   }
 
   void _runServer() {
-    if (!serverRunning && (_ipInput.isNotEmpty) && (_portInput.isNotEmpty)) {
-      if ((validateIP(_ipInput)) && validatePort(_portInput)) {
+    if (!serverRunning &&
+        (_ipInputServer.isNotEmpty) &&
+        (_portInputServer.isNotEmpty)) {
+      if ((validateIP(_ipInputServer)) && validatePort(_portInputServer)) {
         setState(() {
-          _serverAddr = Address(_ipInput, int.parse(_portInput));
+          _serverAddr = Address(_ipInputServer, int.parse(_portInputServer));
           _server = Server(_serverAddr!);
           _server!.start();
           serverRunning = _server!.isRunning();
