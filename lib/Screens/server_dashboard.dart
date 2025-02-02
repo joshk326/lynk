@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:app/Constants/variables.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -275,13 +276,42 @@ class _ServerDashboardState extends State<ServerDashboard> {
                                           return ListTile(
                                             leading:
                                                 const Icon(Icons.file_present),
-                                            title: Text(
+                                            subtitle: Text(
                                                 "From: ${_serverMessages.elementAt(index).sender}"),
-                                            subtitle: Text(_serverMessages
+                                            title: Text(_serverMessages
                                                 .elementAt(index)
                                                 .message),
                                             trailing: IconButton(
-                                                onPressed: () {},
+                                                onPressed: () async {
+                                                  String? outputFile = await FilePicker
+                                                      .platform
+                                                      .saveFile(
+                                                          dialogTitle:
+                                                              'Please select an output file:',
+                                                          fileName:
+                                                              _serverMessages
+                                                                  .elementAt(
+                                                                      index)
+                                                                  .message,
+                                                          bytes: Uint8List.fromList(
+                                                              _serverMessages
+                                                                  .elementAt(
+                                                                      index)
+                                                                  .content
+                                                                  .split(" ")
+                                                                  .map(
+                                                                      int.parse)
+                                                                  .toList()));
+
+                                                  if (outputFile == null) {
+                                                    // User canceled the picker
+                                                  } else {
+                                                    createDialogPopUp(
+                                                        context,
+                                                        "Saved",
+                                                        "File saved to $outputFile");
+                                                  }
+                                                },
                                                 icon:
                                                     const Icon(Icons.download)),
                                           );

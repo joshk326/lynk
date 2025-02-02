@@ -18,7 +18,7 @@ class Client {
 
   _decodeMsg(String data) {
     RegExp regExp = RegExp(
-        r"(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{6}) - From: (\w+), Message: '(.*?)'");
+        r"(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{6}) - From: (\w+), Message: '(.*?)', Content: '(.*?)'");
 
     // Matching the pattern in the log string
     RegExpMatch? match = regExp.firstMatch(data);
@@ -27,8 +27,9 @@ class Client {
       String datetime = match.group(1)!;
       String fromName = match.group(2)!;
       String message = match.group(3)!;
+      String content = match.group(4)!;
 
-      return Message(DateTime.parse(datetime), fromName, message);
+      return Message(DateTime.parse(datetime), fromName, message, content);
     } else {
       return Null;
     }
@@ -71,9 +72,10 @@ class Client {
     return _connected;
   }
 
-  void sendMessage(String message) {
+  void sendMessage(String message, String content) {
     if (_socket != Null) {
-      _socket.write("${DateTime.now()} - From: $_name, Message: '$message'");
+      _socket.write(
+          "${DateTime.now()} - From: $_name, Message: '$message', Content: '$content'");
     }
   }
 }

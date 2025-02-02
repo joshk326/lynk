@@ -2,8 +2,9 @@ class Message {
   late DateTime date;
   late String sender;
   late String message;
-  Message(this.date, this.sender, this.message);
+  late String content;
+  Message(this.date, this.sender, this.message, this.content);
   String asString() {
-    return "$date - From: $sender, Message: '$message'";
+    return "$date - From: $sender, Message: '$message', Content: '$content'";
   }
 }

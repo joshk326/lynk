@@ -52,7 +52,7 @@ class Server {
 
   _decodeMsg(String data) {
     RegExp regExp = RegExp(
-        r"(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{6}) - From: (\w+), Message: '(.*?)'");
+        r"(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{6}) - From: (\w+), Message: '(.*?)', Content: '(.*?)'");
 
     // Matching the pattern in the log string
     RegExpMatch? match = regExp.firstMatch(data);
@@ -61,8 +61,9 @@ class Server {
       String datetime = match.group(1)!;
       String fromName = match.group(2)!;
       String message = match.group(3)!;
+      String content = match.group(4)!;
 
-      return Message(DateTime.parse(datetime), fromName, message);
+      return Message(DateTime.parse(datetime), fromName, message, content);
     } else {
       return Null;
     }
@@ -74,13 +75,13 @@ class Server {
     if (!toSender) {
       for (Socket c in _clients.keys) {
         if (c != sender && message != _clients[sender]) {
-          broadcast = Message(DateTime.now(), _clients[sender]!, message);
+          broadcast = Message(DateTime.now(), _clients[sender]!, message, "");
           c.add(utf8.encode(broadcast.asString()));
           _messages.add(broadcast);
         }
       }
     } else {
-      broadcast = Message(DateTime.now(), "Server", message);
+      broadcast = Message(DateTime.now(), "Server", message, "");
       sender.add(utf8.encode(broadcast.asString()));
     }
   }
