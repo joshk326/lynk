@@ -24,15 +24,15 @@ class ClientDashboard extends StatefulWidget {
 }
 
 class _ClientDashboardState extends State<ClientDashboard> {
+  var ipTxtContr = TextEditingController(
+    text: _ipInputClient.isNotEmpty ? _ipInputClient : "",
+  );
+
+  var portTxtContr = TextEditingController(
+      text: _portInputClient.isNotEmpty ? _portInputClient : "");
+
   @override
   Widget build(BuildContext context) {
-    var ipTxtContr = TextEditingController(
-      text: _ipInputClient.isNotEmpty ? _ipInputClient : "",
-    );
-
-    var portTxtContr = TextEditingController(
-        text: _portInputClient.isNotEmpty ? _portInputClient : "");
-
     return Scaffold(
         body: Center(
       child: SingleChildScrollView(
