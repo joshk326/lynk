@@ -2,10 +2,11 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:app/Classes/server/init.dart';
+import 'package:app/Constants/functions.dart';
 
 Future<void> main() async {
   Address addr = Address("127.0.0.1", 9090);
-  Client client = Client(addr, "test_client");
+  Client client = Client(addr);
   try {
     await client.connect();
   } on SocketException {
@@ -14,5 +15,5 @@ Future<void> main() async {
   }
 
   sleep(const Duration(seconds: 2));
-  client.sendMessage("Hello Bish", "Content");
+  client.sendMessage(createJsonMessage(metadata: "Hello Bish"));
 }
