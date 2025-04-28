@@ -33,6 +33,7 @@ dependencies:
   window_manager: ^0.4.2
   file_picker: ^8.3.1
   rename_app: ^1.6.2
+  optional: ^6.1.0+1
 
 
   # The following adds the Cupertino Icons font to your application.

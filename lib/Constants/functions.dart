@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 bool validateIP(var input) {
   List<String> octets = input.split('.');
 
@@ -43,4 +45,25 @@ bool isNumeric(String s) {
 String idGenerator() {
   final now = DateTime.now();
   return now.microsecondsSinceEpoch.toString();
+}
+
+String createJsonMessage(
+    {String metadata = "",
+    String fileName = "",
+    String fileContent = "",
+    String message = ""}) {
+  var tmp = {
+    "message": {
+      "date": DateTime.now().toString(),
+      "file_name": fileName,
+      "contents": fileContent
+    },
+    "metadata": {"message": metadata}
+  };
+  return jsonEncode(tmp);
+}
+
+Map decodeJsonMessage(String jsonString) {
+  var tmp = jsonDecode(jsonString);
+  return tmp;
 }

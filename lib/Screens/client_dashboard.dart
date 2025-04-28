@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:path/path.dart' as p;
 
@@ -19,6 +20,7 @@ Color _connectBtnColor = darkGreen;
 Address? _serverAddr;
 Client? _client;
 List<Widget> _files = [];
+Map<String, String> _fileData = {};
 
 class ClientDashboard extends StatefulWidget {
   const ClientDashboard({super.key});
@@ -127,7 +129,7 @@ class _ClientDashboardState extends State<ClientDashboard> {
       if ((validateIP(_ipInputClient)) && validatePort(_portInputClient)) {
         setState(() {
           _serverAddr = Address(_ipInputClient, int.parse(_portInputClient));
-          _client = Client(_serverAddr!, idGenerator());
+          _client = Client(_serverAddr!);
         });
 
         await _client!.connect();
@@ -162,13 +164,19 @@ class _ClientDashboardState extends State<ClientDashboard> {
     if (result != null) {
       File file = File(result.files.single.path!);
       Uint8List bytes = file.readAsBytesSync();
+      String fileData = base64Encode(bytes);
       Widget tmp = ListTile(
         leading: const Icon(Icons.file_present),
-        title: Text(file.path),
+        title: Text(p.basename(file.path)),
         trailing: IconButton(
-            onPressed: () {
-              _client!.sendMessage(p.basename(file.path),
-                  bytes.toString().replaceAll(RegExp(r'[\[\],]'), ''));
+            onPressed: () async {
+              setState(() {
+                _fileData[p.basename(file.path)] = fileData;
+              });
+              await _client!.sendMessage(createJsonMessage(
+                  metadata: _client!.name,
+                  fileName: p.basename(file.path),
+                  fileContent: fileData));
               createDialogPopUp(context, "Sent", "File sent to server!");
             },
             icon: const Icon(Icons.send)),

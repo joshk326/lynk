@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:app/Constants/variables.dart';
@@ -293,28 +294,19 @@ class _ServerDashboardState extends State<ServerDashboard> {
                                                                   .elementAt(
                                                                       index)
                                                                   .message,
-                                                          bytes: Uint8List.fromList(
+                                                          bytes: base64Decode(
                                                               _serverMessages
                                                                   .elementAt(
                                                                       index)
-                                                                  .content
-                                                                  .split(" ")
-                                                                  .map(
-                                                                      int.parse)
-                                                                  .toList()));
-
+                                                                  .content));
                                                   if (outputFile != null) {
                                                     File(outputFile)
                                                         .writeAsBytes(
-                                                            Uint8List.fromList(
+                                                            base64Decode(
                                                                 _serverMessages
                                                                     .elementAt(
                                                                         index)
-                                                                    .content
-                                                                    .split(" ")
-                                                                    .map(int
-                                                                        .parse)
-                                                                    .toList()));
+                                                                    .content));
                                                     createDialogPopUp(
                                                         context,
                                                         "Saved",

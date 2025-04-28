@@ -9,6 +9,6 @@ Future<void> main() async {
   for (int i = 0; i < numOfClients; i++) {
     Client client = Client(addr, "test_client_$i");
     await client.connect();
-    client.sendMessage("test $i");
+    client.sendMessage("test $i", "content");
   }
 }

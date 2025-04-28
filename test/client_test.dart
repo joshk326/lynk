@@ -14,5 +14,5 @@ Future<void> main() async {
   }
 
   sleep(const Duration(seconds: 2));
-  client.sendMessage("Hello Bish");
+  client.sendMessage("Hello Bish", "Content");
 }
