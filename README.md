@@ -9,6 +9,15 @@ Lynk is ideal for quick, local file transfers without relying on cloud services,
 
 ---
 
+
+### ⚠️ Notes
+- Files are saved locally on the server device in a user defined directory.
+- The app is designed for trusted local networks only — it does not include built-in encryption or authentication.
+- For secure transfers on untrusted networks, use Lynk in conjunction with a VPN or encrypted tunnel.
+- Web is not supported due to limitations in Flutter's socket support for browsers.
+
+---
+
 ## 🛠 Getting Started
 
 ### 📁 Clone the Repository
@@ -31,11 +40,7 @@ flutter run
 
 Launch the app on two devices (or emulators) on the same local network. Use the Server tab on one and the Client tab on the other. On the client device, enter the IP shown on the server tab, pick a file, and tap send. The file will be transmitted and stored on the server device.
 
-### ⚠️ Notes
-- Files are saved locally on the server device in a user defined directory.
-- The app is designed for trusted local networks only — it does not include built-in encryption or authentication.
-- For secure transfers on untrusted networks, use Lynk in conjunction with a VPN or encrypted tunnel.
-- Web is not supported due to limitations in Flutter's socket support for browsers.
+---
 
 ### 💻 Platform Support
 | Platform    | Status |
@@ -46,6 +51,8 @@ Launch the app on two devices (or emulators) on the same local network. Use the 
 | macOS | ✅ |
 | Linux | ✅ |
 | Web | ❌ |
+
+---
 
 ### 📌 Roadmap
 - Add heartbeat to client to verify the server is still open
