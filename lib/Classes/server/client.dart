@@ -8,8 +8,8 @@ import 'package:app/Constants/functions.dart';
 
 class Client {
   late String name;
+  late Socket socket;
   late Address _host;
-  late Socket _socket;
   late bool _connected;
   final List<Message> _messages = [];
   Client(Address host) {
@@ -33,7 +33,7 @@ class Client {
 
   Future<void> connect() async {
     try {
-      _socket = await Socket.connect(_host.ip(), _host.port());
+      socket = await Socket.connect(_host.ip(), _host.port());
     } catch (ex) {
       return;
     }
@@ -41,26 +41,10 @@ class Client {
 
     // Sender client name back to server
     await sendMessage(createJsonMessage(metadata: name));
-
-    _socket.listen(
-      (Uint8List data) {
-        final serverResponse = String.fromCharCodes(data);
-        var asObj = _decodeMsg(serverResponse);
-        if (asObj != Null) {
-          _messages.add(asObj);
-        }
-      },
-      onError: (error) {
-        _socket.destroy();
-      },
-      onDone: () {
-        _socket.destroy();
-      },
-    );
   }
 
   void disconnect() {
-    _socket.destroy();
+    socket.destroy();
     _connected = false;
   }
 
@@ -73,8 +57,8 @@ class Client {
     int length = jsonBytes.length;
     ByteData lengthBytes = ByteData(4)..setUint32(0, length, Endian.big);
 
-    _socket.add(lengthBytes.buffer.asUint8List());
-    _socket.add(jsonBytes);
-    await _socket.flush();
+    socket.add(lengthBytes.buffer.asUint8List());
+    socket.add(jsonBytes);
+    await socket.flush();
   }
 }

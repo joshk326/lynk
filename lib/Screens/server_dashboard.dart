@@ -274,47 +274,60 @@ class _ServerDashboardState extends State<ServerDashboard> {
                                       child: ListView.builder(
                                         itemCount: _serverMessages.length,
                                         itemBuilder: (context, index) {
+                                          final message =
+                                              _serverMessages.elementAt(index);
                                           return ListTile(
                                             leading:
                                                 const Icon(Icons.file_present),
-                                            subtitle: Text(
-                                                "From: ${_serverMessages.elementAt(index).sender}"),
+                                            subtitle:
+                                                Text("From: ${message.sender}"),
                                             title: Text(_serverMessages
                                                 .elementAt(index)
                                                 .message),
-                                            trailing: IconButton(
-                                                onPressed: () async {
-                                                  String? outputFile = await FilePicker
-                                                      .platform
-                                                      .saveFile(
-                                                          dialogTitle:
-                                                              'Please select an output file:',
-                                                          fileName:
-                                                              _serverMessages
-                                                                  .elementAt(
-                                                                      index)
+                                            trailing: Row(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                IconButton(
+                                                    onPressed: () async {
+                                                      String? outputFile = await FilePicker
+                                                          .platform
+                                                          .saveFile(
+                                                              dialogTitle:
+                                                                  'Please select an output file:',
+                                                              fileName: message
                                                                   .message,
-                                                          bytes: base64Decode(
-                                                              _serverMessages
-                                                                  .elementAt(
-                                                                      index)
-                                                                  .content));
-                                                  if (outputFile != null) {
-                                                    File(outputFile)
-                                                        .writeAsBytes(
-                                                            base64Decode(
-                                                                _serverMessages
-                                                                    .elementAt(
-                                                                        index)
-                                                                    .content));
-                                                    createDialogPopUp(
-                                                        context,
-                                                        "Saved",
-                                                        "File saved to $outputFile");
-                                                  }
-                                                },
-                                                icon:
-                                                    const Icon(Icons.download)),
+                                                              bytes: base64Decode(
+                                                                  message
+                                                                      .content));
+                                                      if (outputFile != null) {
+                                                        File(outputFile)
+                                                            .writeAsBytes(
+                                                                base64Decode(
+                                                                    message
+                                                                        .content));
+                                                        createDialogPopUp(
+                                                            context,
+                                                            "Saved",
+                                                            "File saved to $outputFile");
+                                                      }
+                                                    },
+                                                    icon: const Icon(
+                                                        Icons.download)),
+                                                IconButton(
+                                                  onPressed: () {
+                                                    createConfirmDeleteDialogPopUp(
+                                                        context, () {
+                                                      setState(() {
+                                                        _serverMessages
+                                                            .removeAt(index);
+                                                      });
+                                                    });
+                                                  },
+                                                  icon:
+                                                      const Icon(Icons.delete),
+                                                ),
+                                              ],
+                                            ),
                                           );
                                         },
                                       ),
@@ -397,8 +410,8 @@ class _ServerDashboardState extends State<ServerDashboard> {
         _showConsole = false;
       });
       if (!_checkConsoleError()) {
-        setState(() {
-          _server!.stop();
+        setState(() async {
+          await _server!.stop();
         });
       }
     } else {

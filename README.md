@@ -1,5 +1,59 @@
-# app
+# Lynk
 
-## TODO:
-- Add labels to icons in nav
-- Allow deleting sent and received files
+**Lynk** is a cross-platform file transfer application built with Flutter that enables direct peer-to-peer file sharing over a local network using raw socket connections. Users can send and receive files between devices by switching between **Server** and **Client** tabs within the app.
+
+- The **Server tab** opens a socket and listens for incoming connections. When a client connects and sends a file, the server allows for saving the files to a desired directory.
+- The **Client tab** allows the user to input the server's IP address, select a file, and send it directly.
+
+Lynk is ideal for quick, local file transfers without relying on cloud services, internet access, or third-party tools.
+
+---
+
+## 🛠 Getting Started
+
+### 📁 Clone the Repository
+
+```bash
+git clone https://github.com/joshk326/lynk.git
+cd lynk
+```
+
+### 📦 Install Dependencies
+
+```bash
+flutter pub get
+```
+
+### 🚀 Run the App
+```bash
+flutter run
+```
+
+Launch the app on two devices (or emulators) on the same local network. Use the Server tab on one and the Client tab on the other. On the client device, enter the IP shown on the server tab, pick a file, and tap send. The file will be transmitted and stored on the server device.
+
+### ⚠️ Notes
+- Files are saved locally on the server device in a user defined directory.
+- The app is designed for trusted local networks only — it does not include built-in encryption or authentication.
+- For secure transfers on untrusted networks, use Lynk in conjunction with a VPN or encrypted tunnel.
+- Web is not supported due to limitations in Flutter's socket support for browsers.
+
+### 💻 Platform Support
+| Platform    | Status |
+| -------- | :------: |
+| Android  | ✅ |
+| iOS | ✅ |
+| Windows | ✅ |
+| macOS | ✅ |
+| Linux | ✅ |
+| Web | ❌ |
+
+### 📌 Roadmap
+- Add heartbeat to client to verify the server is still open
+- Add labels to tabs
+- Finish settings page (add default connects, default save path)
+- Transfer progress indicators
+- imporve mobile experience
+- End-to-end file encryption
+- Device pairing and authentication
+- Persistent transfer history
+- Web support (create websocket)
