@@ -115,7 +115,7 @@ class _NavigationState extends State<Navigation> {
                       height: _navHidden
                           ? height / 2
                           : Platform.isIOS || Platform.isAndroid
-                              ? height / 1.5
+                              ? height / 1.65
                               : height - 370,
                     ),
                     IconButton(

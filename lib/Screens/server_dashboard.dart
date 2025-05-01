@@ -306,7 +306,7 @@ class _ServerDashboardState extends State<ServerDashboard> {
                                                                     message
                                                                         .content));
                                                         createDialogPopUp(
-                                                            context,
+                                                            context.mounted ? context : null,
                                                             "Saved",
                                                             "File saved to $outputFile");
                                                       }
@@ -381,7 +381,7 @@ class _ServerDashboardState extends State<ServerDashboard> {
     );
   }
 
-  void _runServer() {
+  Future<void> _runServer() async {
     if (!serverRunning &&
         (_ipInputServer.isNotEmpty) &&
         (_portInputServer.isNotEmpty)) {
@@ -410,9 +410,8 @@ class _ServerDashboardState extends State<ServerDashboard> {
         _showConsole = false;
       });
       if (!_checkConsoleError()) {
-        setState(() async {
-          await _server!.stop();
-        });
+        await _server!.stop();
+        setState(() {});
       }
     } else {
       createDialogPopUp(context, "Error", "Please enter both an ip and port");
@@ -420,7 +419,7 @@ class _ServerDashboardState extends State<ServerDashboard> {
   }
 
   bool _checkConsoleError() {
-    if (_consoleOutput.contains(ServerErrors["CONN_ERR"]!)) {
+    if (_consoleOutput.contains(serverErrors["CONN_ERR"]!)) {
       return true;
     }
     return false;

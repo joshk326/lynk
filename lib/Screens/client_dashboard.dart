@@ -130,7 +130,7 @@ class _ClientDashboardState extends State<ClientDashboard> {
                                             fileName: fileName,
                                             fileContent: fileData,
                                           ));
-                                          createDialogPopUp(context, "Sent",
+                                          createDialogPopUp(context.mounted ? context : null, "Sent",
                                               "File sent to server!");
                                         },
                                         icon: const Icon(Icons.send),
@@ -181,7 +181,7 @@ class _ClientDashboardState extends State<ClientDashboard> {
             _connectBtnColor = Colors.red;
           });
         } catch (e) {
-          createDialogPopUp(context, "Error", "Connection failed: $e");
+          createDialogPopUp(context.mounted ? context : null, "Error", "Connection failed: $e");
         }
       } else {
         createDialogPopUp(context, "Error", "Invalid ip or port format");

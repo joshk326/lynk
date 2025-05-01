@@ -6,7 +6,7 @@ import 'package:app/Classes/server/message.dart';
 import 'package:app/Constants/functions.dart';
 import 'package:optional/optional.dart';
 
-final Map<String, String> ServerErrors = {
+final Map<String, String> serverErrors = {
   'CONN_ERR': 'Failed to bind to given address and port'
 };
 
@@ -31,7 +31,7 @@ class Server {
     try {
       _server = await ServerSocket.bind(address.ip(), address.port());
     } on SocketException {
-      _writeConsole(ServerErrors['CONN_ERR']!);
+      _writeConsole(serverErrors['CONN_ERR']!);
       _running = false;
       return;
     }
