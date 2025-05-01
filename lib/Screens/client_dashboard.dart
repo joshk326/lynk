@@ -36,7 +36,6 @@ class _ClientDashboardState extends State<ClientDashboard> {
 
   var portTxtContr = TextEditingController(
       text: _portInputClient.isNotEmpty ? _portInputClient : "");
-  late Timer _timer;
 
   @override
   Widget build(BuildContext context) {
@@ -198,22 +197,22 @@ class _ClientDashboardState extends State<ClientDashboard> {
   }
 
   void _startConnectionCheck() {
-    _timer = Timer.periodic(const Duration(seconds: 5), (timer) {
-      if (_client != null && !_client!.isConnected()) {
-        createDialogPopUp(
-            context, "Disconnected", "The server conenction has closed.");
-        setState(() {
-          clientConnected = false;
-        });
-        _resetClient();
-      }
-    });
+    // _timer = Timer.periodic(const Duration(seconds: 5), (timer) {
+    //   if (_client != null && !_client!.isConnected()) {
+    //     createDialogPopUp(
+    //         context, "Disconnected", "The server conenction has closed.");
+    //     setState(() {
+    //       clientConnected = false;
+    //     });
+    //     _resetClient();
+    //   }
+    // });
   }
 
   void _stopConnectionCheck() {
-    if (_timer.isActive) {
-      _timer.cancel();
-    }
+    // if (_timer.isActive) {
+    //   _timer.cancel();
+    // }
   }
 
   void _resetClient() {
