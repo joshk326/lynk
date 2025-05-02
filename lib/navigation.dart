@@ -135,9 +135,7 @@ class _NavigationState extends State<Navigation> {
             ),
             const VerticalDivider(thickness: 1, width: 1),
             Expanded(
-              child: Center(
-                child: screens[_currentIndex],
-              ),
+              child: screens[_currentIndex],
             )
           ],
         ),
