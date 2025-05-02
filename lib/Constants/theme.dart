@@ -12,6 +12,19 @@ ThemeData appTheme = ThemeData(
     primaryColor: darkGreen,
     scaffoldBackgroundColor: background,
     highlightColor: lightGreen,
+    bottomAppBarTheme: BottomAppBarTheme(
+      color: background,
+      shape: const CircularNotchedRectangle(),
+      elevation: 0,
+    ),
+    bottomNavigationBarTheme: BottomNavigationBarThemeData(
+      elevation: 0,
+      backgroundColor: Colors.transparent,
+      selectedIconTheme: IconThemeData(size: 22, color: darkGreen),
+      unselectedIconTheme: IconThemeData(size: 22, color: lightGreen),
+      selectedItemColor: darkGreen,
+      unselectedItemColor: lightGreen,
+    ),
     textSelectionTheme: TextSelectionThemeData(
         selectionColor: lightGreen, cursorColor: flatBlack),
     elevatedButtonTheme: ElevatedButtonThemeData(

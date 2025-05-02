@@ -55,9 +55,9 @@ Launch the app on two devices (or emulators) on the same local network. Use the 
 ---
 
 ### 📌 Roadmap
-- Change navigation for mobile devices
+- ✅ ~~Change navigation for mobile devices~~
 - Add heartbeat to client to verify the server is still open
-- ✅ ~~Add labels to tabs (Toggled in settings on desktop platforms)~~
+- ✅ ~~Add labels to tabs (Toggled in settings)~~
 - Finish settings page (add default connects, default save path)
 - Transfer progress indicators
 - imporve mobile experience

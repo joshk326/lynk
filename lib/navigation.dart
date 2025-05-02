@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:app/Constants/theme.dart';
 import 'package:app/Constants/variables.dart';
 import 'package:app/Screens/client_dashboard.dart';
@@ -5,10 +7,6 @@ import 'package:app/Screens/server_dashboard.dart';
 import 'package:app/Screens/settings.dart';
 import 'package:app/Widgets/alert.dart';
 import 'package:flutter/material.dart';
-import 'dart:io' show Platform;
-
-double desktopNavWidth = 200;
-double desktopNavClsoed = 50;
 
 class Navigation extends StatefulWidget {
   const Navigation({super.key});
@@ -20,9 +18,8 @@ class Navigation extends StatefulWidget {
 class _NavigationState extends State<Navigation> {
   int _currentIndex = 0;
 
-  bool _navHidden = Platform.isIOS || Platform.isAndroid ? true : false;
-  double _navWidth =
-      Platform.isIOS || Platform.isAndroid ? 30 : desktopNavWidth;
+  bool _navHidden = false;
+  double _navWidth = 200;
   @override
   Widget build(BuildContext context) {
     final screens = [
@@ -32,46 +29,51 @@ class _NavigationState extends State<Navigation> {
     ];
 
     return Scaffold(
-      body: SafeArea(
-        child: Row(
-          children: <Widget>[
-            Container(
-              height: double.infinity,
-              width: _navWidth,
-              color: flatBlack,
-              child: LayoutBuilder(
-                  builder: (BuildContext context, BoxConstraints constraints) {
-                double height = constraints.maxHeight;
-                return Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Visibility(
-                      visible: !_navHidden,
-                      child: Column(
+      extendBody: true,
+      body: (Platform.isMacOS || Platform.isWindows || Platform.isLinux)
+          ? SafeArea(
+              child: desktopNavigation(screens),
+            )
+          : IndexedStack(
+              index: _currentIndex,
+              children: screens,
+            ),
+      bottomNavigationBar:
+          (Platform.isMacOS || Platform.isWindows || Platform.isLinux)
+              ? const SizedBox.shrink()
+              : mobileNavigation(),
+    );
+  }
+
+  Widget desktopNavigation(List<StatefulWidget> screens) {
+    return Row(
+      children: <Widget>[
+        Container(
+          height: double.infinity,
+          width: _navWidth,
+          color: flatBlack,
+          child: LayoutBuilder(
+              builder: (BuildContext context, BoxConstraints constraints) {
+            return Column(
+              mainAxisSize: MainAxisSize.max,
+              children: [
+                Visibility(
+                  visible: !_navHidden,
+                  child: Wrap(
+                    alignment: WrapAlignment.center,
+                    children: [
+                      // Company Logo
+                      Container(
+                        color: Colors.transparent,
+                        width: double.infinity,
+                        height: 150,
+                        margin: const EdgeInsets.only(bottom: 20),
+                        child: const Image(
+                            image: AssetImage('assets/images/logo.png')),
+                      ),
+                      // Nav Buttons
+                      Column(
                         children: [
-                          Visibility(
-                            visible: Platform.isIOS || Platform.isAndroid
-                                ? true
-                                : false,
-                            child: SizedBox(
-                              height: height / 10,
-                            ),
-                          ),
-                          // Company Logo
-                          Visibility(
-                            visible: Platform.isIOS || Platform.isAndroid
-                                ? false
-                                : true,
-                            child: Container(
-                              color: Colors.transparent,
-                              width: double.infinity,
-                              height: 150,
-                              margin: const EdgeInsets.only(bottom: 20),
-                              child: const Image(
-                                  image: AssetImage('assets/images/logo.png')),
-                            ),
-                          ),
-                          // Nav Buttons
                           creatNavButton(context, "Server", 0, Icons.router,
                               () {
                             clientConnected
@@ -91,52 +93,90 @@ class _NavigationState extends State<Navigation> {
                             screenChange(2);
                           }),
                         ],
-                      ),
-                    ),
-                    // Nav Close Button
-                    SizedBox(
-                      height: _navHidden
-                          ? height / 2
-                          : Platform.isIOS || Platform.isAndroid
-                              ? height / 1.65
-                              : height - 370,
-                    ),
-                    IconButton(
-                      onPressed: () {
-                        setState(() {
-                          _navHidden = !_navHidden;
+                      )
+                    ],
+                  ),
+                ),
+                // Nav Close Button
+                SizedBox(
+                    width: 10,
+                    height: _navHidden
+                        ? (MediaQuery.sizeOf(context).height / 2) - 30
+                        : 0),
+                IconButton(
+                  onPressed: () {
+                    setState(() {
+                      _navHidden = !_navHidden;
 
-                          if (_navHidden) {
-                            _navWidth = Platform.isIOS || Platform.isAndroid
-                                ? 30
-                                : desktopNavClsoed;
-                          } else {
-                            _navWidth = Platform.isIOS || Platform.isAndroid
-                                ? 50
-                                : desktopNavWidth = 200;
-                          }
-                        });
-                      },
-                      icon: Icon(
-                        !_navHidden
-                            ? Icons.keyboard_double_arrow_left
-                            : Icons.keyboard_double_arrow_right,
-                        color: lightGreen,
-                        size: Platform.isIOS || Platform.isAndroid
-                            ? _navHidden
-                                ? 15
-                                : 30
-                            : 30,
-                      ),
-                    ),
-                  ],
-                );
-              }),
+                      if (_navHidden) {
+                        _navWidth = 50;
+                      } else {
+                        _navWidth = 200;
+                      }
+                    });
+                  },
+                  icon: Icon(
+                    !_navHidden
+                        ? Icons.keyboard_double_arrow_left
+                        : Icons.keyboard_double_arrow_right,
+                    color: lightGreen,
+                    size: 30,
+                  ),
+                ),
+              ],
+            );
+          }),
+        ),
+        const VerticalDivider(thickness: 1, width: 1),
+        Expanded(
+          child: screens[_currentIndex],
+        )
+      ],
+    );
+  }
+
+  Widget mobileNavigation() {
+    return SizedBox(
+      height: 85,
+      child: BottomAppBar(
+        color: flatBlack,
+        child: BottomNavigationBar(
+          type: BottomNavigationBarType.fixed,
+          iconSize: showNavLabels ? 22.0 : 30,
+          currentIndex: _currentIndex,
+          showSelectedLabels: showNavLabels,
+          showUnselectedLabels: true,
+          onTap: (index) {
+            if (clientConnected && (index == 0)) {
+              createDialogPopUp(context, "Lynk",
+                  "Unable to access server dashboard while client is connected");
+              return;
+            } else if (serverRunning && (index == 1)) {
+              createDialogPopUp(context, "Lynk",
+                  "Unable to access client dashboard while server is running");
+              return;
+            }
+            screenChange(index);
+          },
+          items: [
+            BottomNavigationBarItem(
+              icon: const Icon(
+                Icons.router,
+              ),
+              label: showNavLabels ? 'Server' : '',
             ),
-            const VerticalDivider(thickness: 1, width: 1),
-            Expanded(
-              child: screens[_currentIndex],
-            )
+            BottomNavigationBarItem(
+              icon: const Icon(
+                Icons.connect_without_contact,
+              ),
+              label: showNavLabels ? 'Client' : '',
+            ),
+            BottomNavigationBarItem(
+              icon: const Icon(
+                Icons.settings,
+              ),
+              label: showNavLabels ? 'Settings' : '',
+            ),
           ],
         ),
       ),
@@ -149,7 +189,7 @@ class _NavigationState extends State<Navigation> {
       iconAlignment: IconAlignment.start,
       icon: Icon(
         icon,
-        size: 30,
+        size: 40,
         color: _currentIndex == navIndex ? darkGreen : lightGreen,
       ),
       onPressed: () {
@@ -157,8 +197,7 @@ class _NavigationState extends State<Navigation> {
           callback();
         });
       },
-      label: (showNavLabels &&
-              (Platform.isWindows || Platform.isLinux || Platform.isMacOS))
+      label: showNavLabels
           ? Text(label)
           : const Text(
               "",

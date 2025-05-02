@@ -41,116 +41,123 @@ class _ClientDashboardState extends State<ClientDashboard> {
   Widget build(BuildContext context) {
     return Scaffold(
         body: Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          SingleChildScrollView(
-            padding: const EdgeInsets.only(right: 20),
-            child: Container(
-              constraints: const BoxConstraints(maxWidth: 650),
-              padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 50),
-              decoration: BoxDecoration(
-                  color: background,
-                  border: Border.all(color: flatBlack),
-                  borderRadius: const BorderRadius.all(Radius.circular(20))),
-              child: Column(
-                children: [
-                  TextField(
-                    controller: ipTxtContr,
-                    maxLength: 15,
-                    decoration:
-                        const InputDecoration(labelText: "IP", counterText: ""),
-                    onChanged: (value) {
-                      setState(() {
-                        _ipInputClient = value;
-                      });
-                    },
-                  ),
-                  TextField(
-                    controller: portTxtContr,
-                    maxLength: 5,
-                    decoration: const InputDecoration(
-                        labelText: "Port", counterText: ""),
-                    inputFormatters: <TextInputFormatter>[
-                      FilteringTextInputFormatter.digitsOnly
-                    ],
-                    onChanged: (value) {
-                      setState(() {
-                        _portInputClient = value;
-                      });
-                    },
-                  ),
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  IconButton(
-                    icon: _connectBtnIcon,
-                    color: _connectBtnColor,
-                    onPressed: () => _connect(),
-                  ),
-                ],
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            SingleChildScrollView(
+              child: Container(
+                constraints: const BoxConstraints(maxWidth: 650),
+                padding:
+                    const EdgeInsets.symmetric(vertical: 20, horizontal: 50),
+                decoration: BoxDecoration(
+                    color: background,
+                    border: Border.all(color: flatBlack),
+                    borderRadius: const BorderRadius.all(Radius.circular(20))),
+                child: Column(
+                  children: [
+                    TextField(
+                      controller: ipTxtContr,
+                      maxLength: 15,
+                      decoration: const InputDecoration(
+                          labelText: "IP", counterText: ""),
+                      onChanged: (value) {
+                        setState(() {
+                          _ipInputClient = value;
+                        });
+                      },
+                    ),
+                    TextField(
+                      controller: portTxtContr,
+                      maxLength: 5,
+                      decoration: const InputDecoration(
+                          labelText: "Port", counterText: ""),
+                      inputFormatters: <TextInputFormatter>[
+                        FilteringTextInputFormatter.digitsOnly
+                      ],
+                      onChanged: (value) {
+                        setState(() {
+                          _portInputClient = value;
+                        });
+                      },
+                    ),
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    IconButton(
+                      icon: _connectBtnIcon,
+                      color: _connectBtnColor,
+                      onPressed: () => _connect(),
+                    ),
+                  ],
+                ),
               ),
             ),
-          ),
-          Visibility(
-            visible: clientConnected,
-            child: Container(
-              height: 200,
-              width: 650,
-              margin: const EdgeInsets.only(top: 20, right: 15),
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                  border: Border.all(color: flatBlack),
-                  borderRadius: const BorderRadius.all(Radius.circular(20))),
-              child: Column(
-                children: [
-                  IconButton(
-                      onPressed: () => _selectFile(),
-                      icon: const Icon(Icons.add)),
-                  Expanded(
-                      child: _fileData.isNotEmpty
-                          ? ListView.builder(
-                              itemCount: _fileData.length,
-                              itemBuilder: (context, index) {
-                                String fileName =
-                                    _fileData.keys.elementAt(index);
-                                return ListTile(
-                                  leading: const Icon(Icons.file_present),
-                                  title: Text(fileName),
-                                  trailing: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      IconButton(
-                                        onPressed: () async {
-                                          String fileData =
-                                              _fileData[fileName]!;
-                                          await _client!
-                                              .sendMessage(createJsonMessage(
-                                            metadata: _client!.name,
-                                            fileName: fileName,
-                                            fileContent: fileData,
-                                          ));
-                                          createDialogPopUp(context.mounted ? context : null, "Sent",
-                                              "File sent to server!");
-                                        },
-                                        icon: const Icon(Icons.send),
-                                      ),
-                                      IconButton(
-                                        onPressed: () {
-                                          _deleteFile(fileName);
-                                        },
-                                        icon: const Icon(Icons.delete),
-                                      ),
-                                    ],
-                                  ),
-                                );
-                              })
-                          : const Text("No Files Added")),
-                ],
+            Visibility(
+              visible: clientConnected,
+              child: Container(
+                height: 200,
+                width: 650,
+                margin: const EdgeInsets.only(top: 20, right: 15),
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                    border: Border.all(color: flatBlack),
+                    borderRadius: const BorderRadius.all(Radius.circular(20))),
+                child: Column(
+                  children: [
+                    IconButton(
+                        onPressed: () => _selectFile(),
+                        icon: const Icon(Icons.add)),
+                    Expanded(
+                        child: _fileData.isNotEmpty
+                            ? ListView.builder(
+                                itemCount: _fileData.length,
+                                itemBuilder: (context, index) {
+                                  String fileName =
+                                      _fileData.keys.elementAt(index);
+                                  return ListTile(
+                                    leading: const Icon(Icons.file_present),
+                                    title: Text(fileName),
+                                    trailing: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        IconButton(
+                                          onPressed: () async {
+                                            String fileData =
+                                                _fileData[fileName]!;
+                                            await _client!
+                                                .sendMessage(createJsonMessage(
+                                              metadata: _client!.name,
+                                              fileName: fileName,
+                                              fileContent: fileData,
+                                            ));
+                                            createDialogPopUp(
+                                                context.mounted
+                                                    ? context
+                                                    : null,
+                                                "Sent",
+                                                "File sent to server!");
+                                          },
+                                          icon: const Icon(Icons.send),
+                                        ),
+                                        IconButton(
+                                          onPressed: () {
+                                            _deleteFile(fileName);
+                                          },
+                                          icon: const Icon(Icons.delete),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                })
+                            : const Text("No Files Added")),
+                  ],
+                ),
               ),
-            ),
-          )
-        ],
+            )
+          ],
+        ),
       ),
     ));
   }
@@ -181,7 +188,8 @@ class _ClientDashboardState extends State<ClientDashboard> {
             _connectBtnColor = Colors.red;
           });
         } catch (e) {
-          createDialogPopUp(context.mounted ? context : null, "Error", "Connection failed: $e");
+          createDialogPopUp(context.mounted ? context : null, "Error",
+              "Connection failed: $e");
         }
       } else {
         createDialogPopUp(context, "Error", "Invalid ip or port format");

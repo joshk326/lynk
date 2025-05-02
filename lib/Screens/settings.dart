@@ -1,6 +1,5 @@
 import 'package:app/Constants/variables.dart';
 import 'package:flutter/material.dart';
-import 'dart:io' show Platform;
 
 class Settings extends StatefulWidget {
   final State nav;
@@ -26,14 +25,10 @@ class _SettingsState extends State<Settings> {
             style: TextStyle(fontSize: 30),
           ),
           const Divider(),
-          Visibility(
-            visible: Platform.isWindows || Platform.isLinux || Platform.isMacOS,
-            child: ListTile(
-              leading: const Text("Show Navigation Labels",
-                  style: TextStyle(fontSize: 15)),
-              trailing:
-                  Switch(value: showNavLabels, onChanged: toggleNavLabels),
-            ),
+          ListTile(
+            leading: const Text("Show Navigation Labels",
+                style: TextStyle(fontSize: 15)),
+            trailing: Switch(value: showNavLabels, onChanged: toggleNavLabels),
           ),
         ],
       ),
