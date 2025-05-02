@@ -19,17 +19,18 @@ class Navigation extends StatefulWidget {
 
 class _NavigationState extends State<Navigation> {
   int _currentIndex = 0;
-  final screens = [
-    const ServerDashboard(),
-    const ClientDashboard(),
-    const Settings()
-  ];
 
   bool _navHidden = Platform.isIOS || Platform.isAndroid ? true : false;
   double _navWidth =
       Platform.isIOS || Platform.isAndroid ? 30 : desktopNavWidth;
   @override
   Widget build(BuildContext context) {
+    final screens = [
+      const ServerDashboard(),
+      const ClientDashboard(),
+      Settings(nav: this)
+    ];
+
     return Scaffold(
       body: SafeArea(
         child: Row(
@@ -42,6 +43,7 @@ class _NavigationState extends State<Navigation> {
                   builder: (BuildContext context, BoxConstraints constraints) {
                 double height = constraints.maxHeight;
                 return Column(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
                     Visibility(
                       visible: !_navHidden,
@@ -69,48 +71,29 @@ class _NavigationState extends State<Navigation> {
                                   image: AssetImage('assets/images/logo.png')),
                             ),
                           ),
-                          IconButton(
-                            onPressed: () {
-                              clientConnected
-                                  ? createDialogPopUp(context, "Lynk",
-                                      "Unable to access server dashboard while client is connected")
-                                  : screenChange(0);
-                            },
-                            iconSize: 30,
-                            icon: Icon(
-                              Icons.router,
-                              color:
-                                  _currentIndex == 0 ? darkGreen : lightGreen,
-                            ),
-                          ),
-                          IconButton(
-                            onPressed: () {
-                              serverRunning
-                                  ? createDialogPopUp(context, "Lynk",
-                                      "Unable to access client dashboard while server is running")
-                                  : screenChange(1);
-                            },
-                            iconSize: 30,
-                            icon: Icon(
-                              Icons.connect_without_contact,
-                              color:
-                                  _currentIndex == 1 ? darkGreen : lightGreen,
-                            ),
-                          ),
-                          IconButton(
-                            onPressed: () {
-                              screenChange(2);
-                            },
-                            iconSize: 30,
-                            icon: Icon(
-                              Icons.settings,
-                              color:
-                                  _currentIndex == 2 ? darkGreen : lightGreen,
-                            ),
-                          )
+                          // Nav Buttons
+                          creatNavButton(context, "Server", 0, Icons.router,
+                              () {
+                            clientConnected
+                                ? createDialogPopUp(context, "Lynk",
+                                    "Unable to access server dashboard while client is connected")
+                                : screenChange(0);
+                          }),
+                          creatNavButton(context, "Client", 1,
+                              Icons.connect_without_contact, () {
+                            serverRunning
+                                ? createDialogPopUp(context, "Lynk",
+                                    "Unable to access client dashboard while server is running")
+                                : screenChange(1);
+                          }),
+                          creatNavButton(context, "Settings", 2, Icons.settings,
+                              () {
+                            screenChange(2);
+                          }),
                         ],
                       ),
                     ),
+                    // Nav Close Button
                     SizedBox(
                       height: _navHidden
                           ? height / 2
@@ -159,6 +142,35 @@ class _NavigationState extends State<Navigation> {
           ],
         ),
       ),
+    );
+  }
+
+  TextButton creatNavButton(BuildContext context, String label, int navIndex,
+      IconData icon, Function callback) {
+    return TextButton.icon(
+      iconAlignment: IconAlignment.start,
+      icon: Icon(
+        icon,
+        size: 30,
+        color: _currentIndex == navIndex ? darkGreen : lightGreen,
+      ),
+      onPressed: () {
+        setState(() {
+          callback();
+        });
+      },
+      label: (showNavLabels &&
+              (Platform.isWindows || Platform.isLinux || Platform.isMacOS))
+          ? Text(label)
+          : const Text(
+              "",
+            ),
+      style: ButtonStyle(
+          padding: const WidgetStatePropertyAll(EdgeInsets.zero),
+          foregroundColor: _currentIndex == navIndex
+              ? WidgetStatePropertyAll(darkGreen)
+              : WidgetStatePropertyAll(lightGreen),
+          overlayColor: const WidgetStatePropertyAll(Colors.transparent)),
     );
   }
 
