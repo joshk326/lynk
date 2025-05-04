@@ -43,10 +43,10 @@ class _ClientDashboardState extends State<ClientDashboard> {
         body: Center(
       child: Padding(
         padding: const EdgeInsets.all(8.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+        child: Wrap(
           children: [
             SingleChildScrollView(
+              padding: const EdgeInsets.only(bottom: 19),
               child: Container(
                 constraints: const BoxConstraints(maxWidth: 650),
                 padding:

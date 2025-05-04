@@ -142,7 +142,7 @@ class _NavigationState extends State<Navigation> {
         color: flatBlack,
         child: BottomNavigationBar(
           type: BottomNavigationBarType.fixed,
-          iconSize: showNavLabels ? 22.0 : 30,
+          enableFeedback: false,
           currentIndex: _currentIndex,
           showSelectedLabels: showNavLabels,
           showUnselectedLabels: true,
