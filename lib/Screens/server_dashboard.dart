@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:developer';
 import 'dart:io';
 
 import 'package:app/Constants/variables.dart';
@@ -62,6 +61,7 @@ class _ServerDashboardState extends State<ServerDashboard> {
                       child: Column(
                         children: [
                           TextField(
+                            enabled: !serverRunning,
                             controller: portTxtContr,
                             maxLength: 5,
                             decoration: const InputDecoration(
@@ -394,6 +394,11 @@ class _ServerDashboardState extends State<ServerDashboard> {
           _serverBtnIcon = const Icon(Icons.stop);
           _serverBtnColor = Colors.red;
         });
+        createDialogPopUp(
+          context,
+          "Running",
+          "Server running on\nIP: $ip, Port: $_portInputServer",
+        );
       } else {
         createDialogPopUp(context, "Error", "Invalid ip or port format");
       }
