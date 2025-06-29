@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 bool validateIP(var input) {
   List<String> octets = input.split('.');
@@ -66,4 +67,23 @@ String createJsonMessage(
 Map decodeJsonMessage(String jsonString) {
   var tmp = jsonDecode(jsonString);
   return tmp;
+}
+
+Future<String> getLocalIPV4() async {
+  NetworkInterface.list();
+  Future<List<NetworkInterface>> ipv4Interfaces =
+      NetworkInterface.list(type: InternetAddressType.IPv4);
+
+  String retVal = "";
+  await ipv4Interfaces.then((List<NetworkInterface> interfaces) {
+    for (var interface in interfaces) {
+      for (var address in interface.addresses) {
+        if (interface.name == "Wi-Fi") {
+          retVal = address.address;
+        }
+      }
+    }
+  });
+
+  return retVal;
 }

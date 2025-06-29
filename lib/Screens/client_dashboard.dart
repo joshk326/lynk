@@ -61,7 +61,7 @@ class _ClientDashboardState extends State<ClientDashboard> {
                       controller: ipTxtContr,
                       maxLength: 15,
                       decoration: const InputDecoration(
-                          labelText: "IP", counterText: ""),
+                          labelText: "Server IP", counterText: ""),
                       onChanged: (value) {
                         setState(() {
                           _ipInputClient = value;
@@ -72,7 +72,7 @@ class _ClientDashboardState extends State<ClientDashboard> {
                       controller: portTxtContr,
                       maxLength: 5,
                       decoration: const InputDecoration(
-                          labelText: "Port", counterText: ""),
+                          labelText: "Server Port", counterText: ""),
                       inputFormatters: <TextInputFormatter>[
                         FilteringTextInputFormatter.digitsOnly
                       ],

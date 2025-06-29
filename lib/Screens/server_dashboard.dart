@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:app/Constants/variables.dart';
@@ -12,7 +13,6 @@ import 'package:app/Constants/theme.dart';
 import 'package:app/Widgets/alert.dart';
 
 // Global variables
-String _ipInputServer = "";
 String _portInputServer = "";
 Address? _serverAddr;
 Server? _server;
@@ -33,10 +33,6 @@ class ServerDashboard extends StatefulWidget {
 }
 
 class _ServerDashboardState extends State<ServerDashboard> {
-  var ipTxtContr = TextEditingController(
-    text: _ipInputServer.isNotEmpty ? _ipInputServer : "",
-  );
-
   var portTxtContr = TextEditingController(
       text: _portInputServer.isNotEmpty ? _portInputServer : "");
 
@@ -65,17 +61,6 @@ class _ServerDashboardState extends State<ServerDashboard> {
                               const BorderRadius.all(Radius.circular(20))),
                       child: Column(
                         children: [
-                          TextField(
-                            controller: ipTxtContr,
-                            maxLength: 15,
-                            decoration: const InputDecoration(
-                                labelText: "IP", counterText: ""),
-                            onChanged: (value) {
-                              setState(() {
-                                _ipInputServer = value;
-                              });
-                            },
-                          ),
                           TextField(
                             controller: portTxtContr,
                             maxLength: 5,
@@ -398,12 +383,11 @@ class _ServerDashboardState extends State<ServerDashboard> {
   }
 
   Future<void> _runServer() async {
-    if (!serverRunning &&
-        (_ipInputServer.isNotEmpty) &&
-        (_portInputServer.isNotEmpty)) {
-      if ((validateIP(_ipInputServer)) && validatePort(_portInputServer)) {
+    String ip = await getLocalIPV4();
+    if (!serverRunning && (ip.isNotEmpty) && (_portInputServer.isNotEmpty)) {
+      if ((validateIP(ip)) && validatePort(_portInputServer)) {
         setState(() {
-          _serverAddr = Address(_ipInputServer, int.parse(_portInputServer));
+          _serverAddr = Address(ip, int.parse(_portInputServer));
           _server = Server(_serverAddr!);
           _server!.start();
           serverRunning = _server!.isRunning();
@@ -430,7 +414,11 @@ class _ServerDashboardState extends State<ServerDashboard> {
         setState(() {});
       }
     } else {
-      createDialogPopUp(context, "Error", "Please enter both an ip and port");
+      createDialogPopUp(
+          context,
+          "Error",
+          (ip.isEmpty ? "Could not obtain local IP address.\n" : "") +
+              (_portInputServer.isEmpty ? "Please input a valid port." : ""));
     }
   }
 
