@@ -270,10 +270,8 @@ class _ServerDashboardState extends State<ServerDashboard> {
                                               leading: const Icon(
                                                   Icons.file_present),
                                               subtitle: Text(
-                                                  "From: ${message.sender}"),
-                                              title: Text(_serverMessages
-                                                  .elementAt(index)
-                                                  .message),
+                                                  "From: ${message.sender}, Size: ${getFileSize(base64Decode(message.content))}"),
+                                              title: Text(message.message),
                                               trailing: Row(
                                                 mainAxisSize: MainAxisSize.min,
                                                 children: [

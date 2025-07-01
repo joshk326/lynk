@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 
 bool validateIP(var input) {
   List<String> octets = input.split('.');
@@ -86,3 +87,21 @@ Future<String> getLocalIPV4() async {
 
   return retVal;
 }
+
+String getFileSize(Uint8List bytes) {
+  int bytesLength = bytes.lengthInBytes;
+
+  if (bytesLength < 1024) {
+    return '$bytesLength B';
+  } else if (bytesLength < 1024 * 1024) {
+    double kbSize = bytesLength / 1024;
+    return '${kbSize.toStringAsFixed(2)} KB';
+  } else if (bytesLength < 1024 * 1024 * 1024) {
+    double mbSize = bytesLength / (1024 * 1024);
+    return '${mbSize.toStringAsFixed(2)} MB';
+  } else {
+    double gbSize = bytesLength / (1024 * 1024 * 1024);
+    return '${gbSize.toStringAsFixed(2)} GB';
+  }
+}
+
