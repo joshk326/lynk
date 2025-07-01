@@ -70,7 +70,6 @@ Map decodeJsonMessage(String jsonString) {
 }
 
 Future<String> getLocalIPV4() async {
-  NetworkInterface.list();
   Future<List<NetworkInterface>> ipv4Interfaces =
       NetworkInterface.list(type: InternetAddressType.IPv4);
 

@@ -42,7 +42,7 @@ ThemeData appTheme = ThemeData(
         thumbColor: WidgetStatePropertyAll(darkGreen),
         thumbVisibility: const WidgetStatePropertyAll(true)),
     appBarTheme: AppBarTheme(
-      backgroundColor: background,
+      backgroundColor: lightGreen,
     ),
     textButtonTheme: TextButtonThemeData(
         style: ButtonStyle(

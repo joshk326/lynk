@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
@@ -12,6 +13,7 @@ import 'package:app/Constants/theme.dart';
 import 'package:app/Widgets/alert.dart';
 
 // Global variables
+String _serverIP = "";
 String _portInputServer = "";
 Address? _serverAddr;
 Server? _server;
@@ -21,8 +23,11 @@ Color _serverBtnColor = darkGreen;
 bool _showConsole = false;
 bool _clientsShown = false;
 bool _messagesShown = false;
+String _clientCount = "0";
+String _fileCount = "0";
 Map<Socket, String> _clients = {};
 List<Message> _serverMessages = [];
+late Timer _timer;
 
 class ServerDashboard extends StatefulWidget {
   const ServerDashboard({super.key});
@@ -36,8 +41,22 @@ class _ServerDashboardState extends State<ServerDashboard> {
       text: _portInputServer.isNotEmpty ? _portInputServer : "");
 
   @override
+  void dispose() {
+    _stopCountCheck();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: serverRunning
+          ? AppBar(
+              title: Text(
+                  "Server running on IP: $_serverIP, Port: $_portInputServer"),
+              centerTitle: true,
+              elevation: 1,
+            )
+          : null,
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(8.0),
@@ -327,52 +346,82 @@ class _ServerDashboardState extends State<ServerDashboard> {
               Visibility(
                   visible: serverRunning,
                   child: Align(
-                    alignment: Alignment.bottomRight,
+                    alignment: (Platform.isWindows || Platform.isMacOS)
+                        ? Alignment.bottomRight
+                        : Alignment.topRight,
                     child: Padding(
                       padding: const EdgeInsets.all(20.0),
-                      child: FloatingActionButton(
-                        backgroundColor: !_clientsShown
-                            ? Theme.of(context)
-                                .floatingActionButtonTheme
-                                .backgroundColor
-                            : flatRed,
-                        onPressed: () {
-                          setState(() {
-                            if (_messagesShown) {
-                              _messagesShown = !_messagesShown;
-                            }
-                            _clientsShown = !_clientsShown;
-                          });
-                        },
-                        child: !_clientsShown
-                            ? const Icon(Icons.person)
-                            : const Icon(Icons.close),
+                      child: Stack(
+                        children: [
+                          FloatingActionButton(
+                            backgroundColor: !_clientsShown
+                                ? Theme.of(context)
+                                    .floatingActionButtonTheme
+                                    .backgroundColor
+                                : flatRed,
+                            onPressed: () {
+                              setState(() {
+                                if (_messagesShown) {
+                                  _messagesShown = !_messagesShown;
+                                }
+                                _clientsShown = !_clientsShown;
+                              });
+                            },
+                            child: !_clientsShown
+                                ? const Icon(Icons.person)
+                                : const Icon(Icons.close),
+                          ),
+                          Positioned(
+                              right: 9,
+                              top: 1,
+                              child: !_clientsShown
+                                  ? Text(
+                                      _clientCount,
+                                      style: TextStyle(color: background),
+                                    )
+                                  : const Text(""))
+                        ],
                       ),
                     ),
                   )),
               Visibility(
                 visible: serverRunning,
                 child: Align(
-                    alignment: Alignment.bottomLeft,
+                    alignment: (Platform.isWindows || Platform.isMacOS)
+                        ? Alignment.bottomLeft
+                        : Alignment.topLeft,
                     child: Padding(
                         padding: const EdgeInsets.all(20),
-                        child: FloatingActionButton(
-                          backgroundColor: !_messagesShown
-                              ? Theme.of(context)
-                                  .floatingActionButtonTheme
-                                  .backgroundColor
-                              : flatRed,
-                          onPressed: () {
-                            setState(() {
-                              if (_clientsShown) {
-                                _clientsShown = !_clientsShown;
-                              }
-                              _messagesShown = !_messagesShown;
-                            });
-                          },
-                          child: !_messagesShown
-                              ? const Icon(Icons.file_open)
-                              : const Icon(Icons.close),
+                        child: Stack(
+                          children: [
+                            FloatingActionButton(
+                              backgroundColor: !_messagesShown
+                                  ? Theme.of(context)
+                                      .floatingActionButtonTheme
+                                      .backgroundColor
+                                  : flatRed,
+                              onPressed: () {
+                                setState(() {
+                                  if (_clientsShown) {
+                                    _clientsShown = !_clientsShown;
+                                  }
+                                  _messagesShown = !_messagesShown;
+                                });
+                              },
+                              child: !_messagesShown
+                                  ? const Icon(Icons.file_open)
+                                  : const Icon(Icons.close),
+                            ),
+                            Positioned(
+                                right: 9,
+                                top: 1,
+                                child: !_messagesShown
+                                    ? Text(
+                                        _fileCount,
+                                        style: TextStyle(color: background),
+                                      )
+                                    : const Text(""))
+                          ],
                         ))),
               )
             ],
@@ -383,22 +432,20 @@ class _ServerDashboardState extends State<ServerDashboard> {
   }
 
   Future<void> _runServer() async {
-    String ip = await getLocalIPV4();
-    if (!serverRunning && (ip.isNotEmpty) && (_portInputServer.isNotEmpty)) {
-      if ((validateIP(ip)) && validatePort(_portInputServer)) {
+    _serverIP = await getLocalIPV4();
+    if (!serverRunning &&
+        (_serverIP.isNotEmpty) &&
+        (_portInputServer.isNotEmpty)) {
+      if ((validateIP(_serverIP)) && validatePort(_portInputServer)) {
         setState(() {
-          _serverAddr = Address(ip, int.parse(_portInputServer));
+          _serverAddr = Address(_serverIP, int.parse(_portInputServer));
           _server = Server(_serverAddr!);
           _server!.start();
           serverRunning = _server!.isRunning();
           _serverBtnIcon = const Icon(Icons.stop);
           _serverBtnColor = Colors.red;
         });
-        createDialogPopUp(
-          context,
-          "Running",
-          "Server running on\nIP: $ip, Port: $_portInputServer",
-        );
+        _countChecks();
       } else {
         createDialogPopUp(context, "Error", "Invalid ip or port format");
       }
@@ -422,7 +469,7 @@ class _ServerDashboardState extends State<ServerDashboard> {
       createDialogPopUp(
           context,
           "Error",
-          (ip.isEmpty ? "Could not obtain local IP address.\n" : "") +
+          (_serverIP.isEmpty ? "Could not obtain local IP address.\n" : "") +
               (_portInputServer.isEmpty ? "Please input a valid port." : ""));
     }
   }
@@ -448,6 +495,7 @@ class _ServerDashboardState extends State<ServerDashboard> {
     if (serverRunning) {
       setState(() {
         _clients = _server!.getClients();
+        _clientCount = _clients.length.toString();
       });
     }
   }
@@ -456,7 +504,23 @@ class _ServerDashboardState extends State<ServerDashboard> {
     if (serverRunning) {
       setState(() {
         _serverMessages = _server!.getMessages();
+        _fileCount = _serverMessages.length.toString();
       });
+    }
+  }
+
+  void _countChecks() {
+    _timer = Timer.periodic(const Duration(seconds: 5), (timer) {
+      if (serverRunning) {
+        _getClients();
+        _getServerMessages();
+      }
+    });
+  }
+
+  void _stopCountCheck() {
+    if (_timer.isActive) {
+      _timer.cancel();
     }
   }
 }

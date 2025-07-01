@@ -59,6 +59,7 @@ class _ClientDashboardState extends State<ClientDashboard> {
                   children: [
                     TextField(
                       controller: ipTxtContr,
+                      enabled: !clientConnected,
                       maxLength: 15,
                       decoration: const InputDecoration(
                           labelText: "Server IP", counterText: ""),
@@ -70,6 +71,7 @@ class _ClientDashboardState extends State<ClientDashboard> {
                     ),
                     TextField(
                       controller: portTxtContr,
+                      enabled: !clientConnected,
                       maxLength: 5,
                       decoration: const InputDecoration(
                           labelText: "Server Port", counterText: ""),
