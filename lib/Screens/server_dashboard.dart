@@ -27,7 +27,7 @@ String _clientCount = "0";
 String _fileCount = "0";
 Map<Socket, String> _clients = {};
 List<Message> _serverMessages = [];
-late Timer _timer;
+late Timer _countsTimer;
 
 class ServerDashboard extends StatefulWidget {
   const ServerDashboard({super.key});
@@ -39,6 +39,12 @@ class ServerDashboard extends StatefulWidget {
 class _ServerDashboardState extends State<ServerDashboard> {
   var portTxtContr = TextEditingController(
       text: _portInputServer.isNotEmpty ? _portInputServer : "");
+
+  @override
+  void initState() {
+    _countsTimer = Timer(Duration.zero, () {});
+    super.initState();
+  }
 
   @override
   void dispose() {
@@ -445,7 +451,8 @@ class _ServerDashboardState extends State<ServerDashboard> {
         });
         _countChecks();
       } else {
-        createDialogPopUp(context, "Error", "Invalid ip or port format");
+        createDialogPopUp(context.mounted ? context : null, "Error",
+            "Invalid ip or port format");
       }
     } else if (serverRunning && _server != null) {
       // Do some error checking - kind of looks gross...
@@ -465,7 +472,7 @@ class _ServerDashboardState extends State<ServerDashboard> {
       }
     } else {
       createDialogPopUp(
-          context,
+          context.mounted ? context : null,
           "Error",
           (_serverIP.isEmpty ? "Could not obtain local IP address.\n" : "") +
               (_portInputServer.isEmpty ? "Please input a valid port." : ""));
@@ -508,7 +515,7 @@ class _ServerDashboardState extends State<ServerDashboard> {
   }
 
   void _countChecks() {
-    _timer = Timer.periodic(const Duration(seconds: 5), (timer) {
+    _countsTimer = Timer.periodic(const Duration(seconds: 5), (timer) {
       if (serverRunning) {
         _getClients();
         _getServerMessages();
@@ -517,8 +524,8 @@ class _ServerDashboardState extends State<ServerDashboard> {
   }
 
   void _stopCountCheck() {
-    if (_timer.isActive) {
-      _timer.cancel();
+    if (_countsTimer.isActive) {
+      _countsTimer.cancel();
     }
   }
 }

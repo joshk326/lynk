@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 
-import 'package:app/Classes/server/address.dart';
+import 'package:app/Classes/server/init.dart';
 import 'package:app/Constants/functions.dart';
 
 class Client {
@@ -26,6 +26,8 @@ class Client {
 
     // Sender client name back to server
     await sendMessage(createJsonMessage(metadata: name));
+
+    _handleConnection(socket);
   }
 
   void disconnect() {
@@ -45,5 +47,25 @@ class Client {
     socket.add(lengthBytes.buffer.asUint8List());
     socket.add(jsonBytes);
     await socket.flush();
+  }
+
+  void _handleConnection(Socket client) {
+    client.listen(
+      (Uint8List data) async {
+        String msg = decodeJsonMessage(String.fromCharCodes(data))["metadata"]
+            ["message"];
+
+        if (msg.isEmpty || !msg.contains(heartBeat)) {
+          disconnect();
+        }
+      },
+      onError: (error) {
+        disconnect();
+        return;
+      },
+      onDone: () {
+        _connected = false;
+      },
+    );
   }
 }

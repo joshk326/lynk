@@ -4,6 +4,7 @@ import 'dart:typed_data';
 import 'package:app/Classes/server/address.dart';
 import 'package:app/Classes/server/message.dart';
 import 'package:app/Constants/functions.dart';
+import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:optional/optional.dart';
 
 final Map<String, String> serverErrors = {
@@ -14,6 +15,8 @@ class _ClientBuffer {
   List<int> buffer = [];
   int? expectedLength;
 }
+
+const String heartBeat = "HEARTBEAT";
 
 final Map<Socket, _ClientBuffer> _buffers = {};
 
@@ -45,7 +48,9 @@ class Server {
 
   void _writeConsole(String msg) {
     if (msg.isNotEmpty) {
-      print(msg);
+      if (kDebugMode) {
+        print(msg);
+      }
       _consoleOutput.add(msg);
     }
   }
@@ -120,13 +125,18 @@ class Server {
             if (!_checkClientExists(client)) {
               _clients[client] =
                   decodeJsonMessage(message)["metadata"]["message"];
-              _broadcastMessage(client, "You are logged in as: $message", true);
+              _broadcastMessage(client, "You are logged in, $heartBeat", true);
             } else {
               Optional<Message> tmp = _decodeMsg(message);
+
               if (tmp.isPresent) {
-                _messages.add(tmp.value);
-                String fileName = tmp.value.message;
-                _writeConsole("Received: $fileName");
+                if (!tmp.value.sender.contains(heartBeat)) {
+                  _messages.add(tmp.value);
+                  String fileName = tmp.value.message;
+                  _writeConsole("Received: $fileName");
+                } else {
+                  _broadcastMessage(client, heartBeat, true);
+                }
               }
             }
           } else {
@@ -161,6 +171,9 @@ class Server {
 
   Future<void> stop() async {
     if (_running) {
+      for (Socket client in _buffers.keys) {
+        _broadcastMessage(client, "disconnected", true);
+      }
       _running = false;
       await _server.close();
       _writeConsole("${DateTime.now()} - Server: Closed connection");

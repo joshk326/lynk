@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'package:app/Classes/server/server.dart';
 import 'package:path/path.dart' as p;
 
 import 'package:app/Classes/server/address.dart';
@@ -21,6 +22,7 @@ Color _connectBtnColor = darkGreen;
 Address? _serverAddr;
 Client? _client;
 Map<String, String> _fileData = {};
+late Timer _heartBeatTimer;
 
 class ClientDashboard extends StatefulWidget {
   const ClientDashboard({super.key});
@@ -36,6 +38,12 @@ class _ClientDashboardState extends State<ClientDashboard> {
 
   var portTxtContr = TextEditingController(
       text: _portInputClient.isNotEmpty ? _portInputClient : "");
+
+  @override
+  void initState() {
+    _heartBeatTimer = Timer(Duration.zero, () {});
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -207,22 +215,27 @@ class _ClientDashboardState extends State<ClientDashboard> {
   }
 
   void _startConnectionCheck() {
-    // _timer = Timer.periodic(const Duration(seconds: 5), (timer) {
-    //   if (_client != null && !_client!.isConnected()) {
-    //     createDialogPopUp(
-    //         context, "Disconnected", "The server conenction has closed.");
-    //     setState(() {
-    //       clientConnected = false;
-    //     });
-    //     _resetClient();
-    //   }
-    // });
+    _heartBeatTimer = Timer.periodic(const Duration(seconds: 5), (timer) {
+      if (_client != null) {
+        // Send heartbeat message
+        if (!_client!.isConnected()) {
+          createDialogPopUp(
+              context, "Disconnected", "The server conenction has closed.");
+          setState(() {
+            clientConnected = false;
+          });
+          _resetClient();
+        } else {
+          _client!.sendMessage(createJsonMessage(metadata: heartBeat));
+        }
+      }
+    });
   }
 
   void _stopConnectionCheck() {
-    // if (_timer.isActive) {
-    //   _timer.cancel();
-    // }
+    if (_heartBeatTimer.isActive) {
+      _heartBeatTimer.cancel();
+    }
   }
 
   void _resetClient() {
@@ -233,6 +246,7 @@ class _ClientDashboardState extends State<ClientDashboard> {
       _connectBtnColor = darkGreen;
       _fileData.clear();
     });
+    _stopConnectionCheck();
   }
 
   Future<void> _selectFile() async {
