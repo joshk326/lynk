@@ -37,8 +37,7 @@ class ServerDashboard extends StatefulWidget {
 }
 
 class _ServerDashboardState extends State<ServerDashboard> {
-  var portTxtContr = TextEditingController(
-      text: _portInputServer.isNotEmpty ? _portInputServer : "");
+  var portTxtContr = TextEditingController(text: _portInputServer.isNotEmpty ? _portInputServer : "");
 
   @override
   void initState() {
@@ -57,8 +56,7 @@ class _ServerDashboardState extends State<ServerDashboard> {
     return Scaffold(
       appBar: serverRunning
           ? AppBar(
-              title: Text(
-                  "Server running on IP: $_serverIP, Port: $_portInputServer"),
+              title: Text("Server running on IP: $_serverIP, Port: $_portInputServer"),
               centerTitle: true,
               elevation: 1,
             )
@@ -76,24 +74,19 @@ class _ServerDashboardState extends State<ServerDashboard> {
                   children: [
                     Container(
                       constraints: const BoxConstraints(maxWidth: 650),
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 20, horizontal: 50),
+                      padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 50),
                       decoration: BoxDecoration(
                           color: background,
                           border: Border.all(color: flatBlack),
-                          borderRadius:
-                              const BorderRadius.all(Radius.circular(20))),
+                          borderRadius: const BorderRadius.all(Radius.circular(20))),
                       child: Column(
                         children: [
                           TextField(
                             enabled: !serverRunning,
                             controller: portTxtContr,
                             maxLength: 5,
-                            decoration: const InputDecoration(
-                                labelText: "Port", counterText: ""),
-                            inputFormatters: <TextInputFormatter>[
-                              FilteringTextInputFormatter.digitsOnly
-                            ],
+                            decoration: const InputDecoration(labelText: "Port", counterText: ""),
+                            inputFormatters: <TextInputFormatter>[FilteringTextInputFormatter.digitsOnly],
                             onChanged: (value) {
                               setState(() {
                                 _portInputServer = value;
@@ -136,8 +129,7 @@ class _ServerDashboardState extends State<ServerDashboard> {
                     Visibility(
                       visible: _showConsole,
                       child: StreamBuilder(
-                          stream: Stream.periodic(const Duration(seconds: 1))
-                              .asyncMap((i) => _getConsoleData()),
+                          stream: Stream.periodic(const Duration(seconds: 1)).asyncMap((i) => _getConsoleData()),
                           builder: (context, snapshot) {
                             var data = snapshot.data;
                             if (serverRunning && (data != null)) {
@@ -155,8 +147,7 @@ class _ServerDashboardState extends State<ServerDashboard> {
                                 padding: const EdgeInsets.all(20),
                                 decoration: BoxDecoration(
                                     border: Border.all(color: flatBlack),
-                                    borderRadius: const BorderRadius.all(
-                                        Radius.circular(20))),
+                                    borderRadius: const BorderRadius.all(Radius.circular(20))),
                                 child: Column(
                                   children: [
                                     Text(
@@ -169,9 +160,7 @@ class _ServerDashboardState extends State<ServerDashboard> {
                                     ),
                                     Expanded(
                                         child: SingleChildScrollView(
-                                            padding: const EdgeInsets.only(
-                                                right: 20),
-                                            child: Text(_consoleOutput))),
+                                            padding: const EdgeInsets.only(right: 20), child: Text(_consoleOutput))),
                                   ],
                                 ));
                           }),
@@ -199,23 +188,18 @@ class _ServerDashboardState extends State<ServerDashboard> {
                                   return Center(
                                     child: Container(
                                       padding: const EdgeInsets.all(20),
-                                      constraints:
-                                          const BoxConstraints(maxHeight: 300),
+                                      constraints: const BoxConstraints(maxHeight: 300),
                                       decoration: BoxDecoration(
-                                          color: background,
-                                          borderRadius: const BorderRadius.all(
-                                              Radius.circular(20))),
+                                          color: background, borderRadius: const BorderRadius.all(Radius.circular(20))),
                                       child: ListView.builder(
                                         itemCount: _clients.length,
                                         itemBuilder: (context, index) {
                                           return ListTile(
                                             leading: const Icon(Icons.person),
-                                            title: Text(_clients.values
-                                                .elementAt(index)),
+                                            title: Text(_clients.values.elementAt(index)),
                                             subtitle: Text(
                                                 "${_clients.keys.elementAt(index).remoteAddress.address}:${_clients.keys.elementAt(index).remotePort}"),
-                                            trailing: Text(
-                                                "${_clients.keys.elementAt(index).remoteAddress.type}"),
+                                            trailing: Text("${_clients.keys.elementAt(index).remoteAddress.type}"),
                                           );
                                         },
                                       ),
@@ -227,11 +211,8 @@ class _ServerDashboardState extends State<ServerDashboard> {
                                         padding: const EdgeInsets.all(20),
                                         decoration: BoxDecoration(
                                             color: background,
-                                            borderRadius:
-                                                const BorderRadius.all(
-                                                    Radius.circular(20))),
-                                        child:
-                                            const Text("No clients connected")),
+                                            borderRadius: const BorderRadius.all(Radius.circular(20))),
+                                        child: const Text("No clients connected")),
                                   );
                                 }
                               }),
@@ -255,26 +236,20 @@ class _ServerDashboardState extends State<ServerDashboard> {
                             child: FutureBuilder(
                                 future: _getServerMessages(),
                                 builder: (context, snapshot) {
-                                  if (serverRunning &&
-                                      _serverMessages.isNotEmpty) {
+                                  if (serverRunning && _serverMessages.isNotEmpty) {
                                     return Center(
                                       child: Container(
                                         padding: const EdgeInsets.all(20),
-                                        constraints: const BoxConstraints(
-                                            maxHeight: 300),
+                                        constraints: const BoxConstraints(maxHeight: 300),
                                         decoration: BoxDecoration(
                                             color: background,
-                                            borderRadius:
-                                                const BorderRadius.all(
-                                                    Radius.circular(20))),
+                                            borderRadius: const BorderRadius.all(Radius.circular(20))),
                                         child: ListView.builder(
                                           itemCount: _serverMessages.length,
                                           itemBuilder: (context, index) {
-                                            final message = _serverMessages
-                                                .elementAt(index);
+                                            final message = _serverMessages.elementAt(index);
                                             return ListTile(
-                                              leading: const Icon(
-                                                  Icons.file_present),
+                                              leading: const Icon(Icons.file_present),
                                               subtitle: Text(
                                                   "From: ${message.sender}, Size: ${getFileSize(base64Decode(message.content))}"),
                                               title: Text(message.message),
@@ -283,45 +258,26 @@ class _ServerDashboardState extends State<ServerDashboard> {
                                                 children: [
                                                   IconButton(
                                                       onPressed: () async {
-                                                        String? outputFile = await FilePicker
-                                                            .platform
-                                                            .saveFile(
-                                                                dialogTitle:
-                                                                    'Please select an output file:',
-                                                                fileName: message
-                                                                    .message,
-                                                                bytes: base64Decode(
-                                                                    message
-                                                                        .content));
-                                                        if (outputFile !=
-                                                            null) {
-                                                          File(outputFile)
-                                                              .writeAsBytes(
-                                                                  base64Decode(
-                                                                      message
-                                                                          .content));
-                                                          createDialogPopUp(
-                                                              context.mounted
-                                                                  ? context
-                                                                  : null,
-                                                              "Saved",
+                                                        String? outputFile = await FilePicker.platform.saveFile(
+                                                            dialogTitle: 'Please select an output file:',
+                                                            fileName: message.message,
+                                                            bytes: base64Decode(message.content));
+                                                        if (outputFile != null) {
+                                                          File(outputFile).writeAsBytes(base64Decode(message.content));
+                                                          createDialogPopUp(context.mounted ? context : null, "Saved",
                                                               "File saved to $outputFile");
                                                         }
                                                       },
-                                                      icon: const Icon(
-                                                          Icons.download)),
+                                                      icon: const Icon(Icons.download)),
                                                   IconButton(
                                                     onPressed: () {
-                                                      createConfirmDeleteDialogPopUp(
-                                                          context, () {
+                                                      createConfirmDeleteDialogPopUp(context, () {
                                                         setState(() {
-                                                          _serverMessages
-                                                              .removeAt(index);
+                                                          _serverMessages.removeAt(index);
                                                         });
                                                       });
                                                     },
-                                                    icon: const Icon(
-                                                        Icons.delete),
+                                                    icon: const Icon(Icons.delete),
                                                   ),
                                                 ],
                                               ),
@@ -336,11 +292,8 @@ class _ServerDashboardState extends State<ServerDashboard> {
                                           padding: const EdgeInsets.all(20),
                                           decoration: BoxDecoration(
                                               color: background,
-                                              borderRadius:
-                                                  const BorderRadius.all(
-                                                      Radius.circular(20))),
-                                          child:
-                                              const Text("No files receieved")),
+                                              borderRadius: const BorderRadius.all(Radius.circular(20))),
+                                          child: const Text("No files receieved")),
                                     );
                                   }
                                 }),
@@ -350,19 +303,14 @@ class _ServerDashboardState extends State<ServerDashboard> {
               Visibility(
                   visible: serverRunning,
                   child: Align(
-                    alignment: (Platform.isWindows || Platform.isMacOS)
-                        ? Alignment.bottomRight
-                        : Alignment.topRight,
+                    alignment: (Platform.isWindows || Platform.isMacOS) ? Alignment.bottomRight : Alignment.topRight,
                     child: Padding(
                       padding: const EdgeInsets.all(20.0),
                       child: Stack(
                         children: [
                           FloatingActionButton(
-                            backgroundColor: !_clientsShown
-                                ? Theme.of(context)
-                                    .floatingActionButtonTheme
-                                    .backgroundColor
-                                : flatRed,
+                            backgroundColor:
+                                !_clientsShown ? Theme.of(context).floatingActionButtonTheme.backgroundColor : flatRed,
                             onPressed: () {
                               setState(() {
                                 if (_messagesShown) {
@@ -371,9 +319,7 @@ class _ServerDashboardState extends State<ServerDashboard> {
                                 _clientsShown = !_clientsShown;
                               });
                             },
-                            child: !_clientsShown
-                                ? const Icon(Icons.person)
-                                : const Icon(Icons.close),
+                            child: !_clientsShown ? const Icon(Icons.person) : const Icon(Icons.close),
                           ),
                           Positioned(
                               right: 9,
@@ -391,18 +337,14 @@ class _ServerDashboardState extends State<ServerDashboard> {
               Visibility(
                 visible: serverRunning,
                 child: Align(
-                    alignment: (Platform.isWindows || Platform.isMacOS)
-                        ? Alignment.bottomLeft
-                        : Alignment.topLeft,
+                    alignment: (Platform.isWindows || Platform.isMacOS) ? Alignment.bottomLeft : Alignment.topLeft,
                     child: Padding(
                         padding: const EdgeInsets.all(20),
                         child: Stack(
                           children: [
                             FloatingActionButton(
                               backgroundColor: !_messagesShown
-                                  ? Theme.of(context)
-                                      .floatingActionButtonTheme
-                                      .backgroundColor
+                                  ? Theme.of(context).floatingActionButtonTheme.backgroundColor
                                   : flatRed,
                               onPressed: () {
                                 setState(() {
@@ -412,9 +354,7 @@ class _ServerDashboardState extends State<ServerDashboard> {
                                   _messagesShown = !_messagesShown;
                                 });
                               },
-                              child: !_messagesShown
-                                  ? const Icon(Icons.file_open)
-                                  : const Icon(Icons.close),
+                              child: !_messagesShown ? const Icon(Icons.file_open) : const Icon(Icons.close),
                             ),
                             Positioned(
                                 right: 9,
@@ -437,9 +377,7 @@ class _ServerDashboardState extends State<ServerDashboard> {
 
   Future<void> _runServer() async {
     _serverIP = await getLocalIPV4();
-    if (!serverRunning &&
-        (_serverIP.isNotEmpty) &&
-        (_portInputServer.isNotEmpty)) {
+    if (!serverRunning && (_serverIP.isNotEmpty) && (_portInputServer.isNotEmpty)) {
       if ((validateIP(_serverIP)) && validatePort(_portInputServer)) {
         setState(() {
           _serverAddr = Address(_serverIP, int.parse(_portInputServer));
@@ -451,8 +389,7 @@ class _ServerDashboardState extends State<ServerDashboard> {
         });
         _countChecks();
       } else {
-        createDialogPopUp(context.mounted ? context : null, "Error",
-            "Invalid ip or port format");
+        createDialogPopUp(context.mounted ? context : null, "Error", "Invalid ip or port format");
       }
     } else if (serverRunning && _server != null) {
       // Do some error checking - kind of looks gross...

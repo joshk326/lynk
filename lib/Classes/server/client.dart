@@ -52,8 +52,7 @@ class Client {
   void _handleConnection(Socket client) {
     client.listen(
       (Uint8List data) async {
-        String msg = decodeJsonMessage(String.fromCharCodes(data))["metadata"]
-            ["message"];
+        String msg = decodeJsonMessage(String.fromCharCodes(data))["metadata"]["message"];
 
         if (msg.isEmpty || !msg.contains(heartBeat)) {
           disconnect();

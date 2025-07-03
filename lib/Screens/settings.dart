@@ -26,8 +26,7 @@ class _SettingsState extends State<Settings> {
           ),
           const Divider(),
           ListTile(
-            leading: const Text("Show Navigation Labels",
-                style: TextStyle(fontSize: 15)),
+            leading: const Text("Show Navigation Labels", style: TextStyle(fontSize: 15)),
             trailing: Switch(value: showNavLabels, onChanged: toggleNavLabels),
           ),
         ],

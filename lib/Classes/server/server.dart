@@ -7,9 +7,7 @@ import 'package:app/Constants/functions.dart';
 import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:optional/optional.dart';
 
-final Map<String, String> serverErrors = {
-  'CONN_ERR': 'Failed to bind to given address and port'
-};
+final Map<String, String> serverErrors = {'CONN_ERR': 'Failed to bind to given address and port'};
 
 class _ClientBuffer {
   List<int> buffer = [];
@@ -39,8 +37,7 @@ class Server {
       return;
     }
 
-    _writeConsole(
-        "${DateTime.now()} - Server is running on: ${address.ip()}:${address.port()}");
+    _writeConsole("${DateTime.now()} - Server is running on: ${address.ip()}:${address.port()}");
     _server.listen((Socket client) {
       _handleConnection(client);
     });
@@ -67,18 +64,14 @@ class Server {
   Optional<Message> _decodeMsg(String data) {
     if (data.isNotEmpty) {
       Map tmp = decodeJsonMessage(data);
-      return Optional.of(Message(
-          DateTime.parse(tmp["message"]["date"]),
-          tmp["metadata"]["message"],
-          tmp["message"]["file_name"],
-          tmp["message"]["contents"]));
+      return Optional.of(Message(DateTime.parse(tmp["message"]["date"]), tmp["metadata"]["message"],
+          tmp["message"]["file_name"], tmp["message"]["contents"]));
     } else {
       return const Optional.empty();
     }
   }
 
-  void _broadcastMessage(Socket sender, String message,
-      [bool toSender = false]) {
+  void _broadcastMessage(Socket sender, String message, [bool toSender = false]) {
     Message broadcast;
     if (!toSender) {
       for (Socket c in _clients.keys) {
@@ -95,8 +88,7 @@ class Server {
   }
 
   void _handleConnection(Socket client) {
-    _writeConsole(
-        "${DateTime.now()} - Server: Connection from ${client.address}:${client.remotePort}");
+    _writeConsole("${DateTime.now()} - Server: Connection from ${client.address}:${client.remotePort}");
 
     _buffers[client] = _ClientBuffer();
 
@@ -108,14 +100,11 @@ class Server {
         while (true) {
           if (buf.expectedLength == null && buf.buffer.length >= 4) {
             final lengthBytes = buf.buffer.sublist(0, 4);
-            buf.expectedLength =
-                ByteData.sublistView(Uint8List.fromList(lengthBytes))
-                    .getUint32(0, Endian.big);
+            buf.expectedLength = ByteData.sublistView(Uint8List.fromList(lengthBytes)).getUint32(0, Endian.big);
             buf.buffer.removeRange(0, 4);
           }
 
-          if (buf.expectedLength != null &&
-              buf.buffer.length >= buf.expectedLength!) {
+          if (buf.expectedLength != null && buf.buffer.length >= buf.expectedLength!) {
             final messageBytes = buf.buffer.sublist(0, buf.expectedLength!);
             final message = utf8.decode(messageBytes);
 
@@ -123,8 +112,7 @@ class Server {
             buf.expectedLength = null;
 
             if (!_checkClientExists(client)) {
-              _clients[client] =
-                  decodeJsonMessage(message)["metadata"]["message"];
+              _clients[client] = decodeJsonMessage(message)["metadata"]["message"];
               _broadcastMessage(client, "You are logged in, $heartBeat", true);
             } else {
               Optional<Message> tmp = _decodeMsg(message);

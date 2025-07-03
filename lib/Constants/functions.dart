@@ -49,17 +49,9 @@ String idGenerator() {
   return now.microsecondsSinceEpoch.toString();
 }
 
-String createJsonMessage(
-    {String metadata = "",
-    String fileName = "",
-    String fileContent = "",
-    String message = ""}) {
+String createJsonMessage({String metadata = "", String fileName = "", String fileContent = "", String message = ""}) {
   var tmp = {
-    "message": {
-      "date": DateTime.now().toString(),
-      "file_name": fileName,
-      "contents": fileContent
-    },
+    "message": {"date": DateTime.now().toString(), "file_name": fileName, "contents": fileContent},
     "metadata": {"message": metadata}
   };
   return jsonEncode(tmp);
@@ -71,8 +63,7 @@ Map decodeJsonMessage(String jsonString) {
 }
 
 Future<String> getLocalIPV4() async {
-  Future<List<NetworkInterface>> ipv4Interfaces =
-      NetworkInterface.list(type: InternetAddressType.IPv4);
+  Future<List<NetworkInterface>> ipv4Interfaces = NetworkInterface.list(type: InternetAddressType.IPv4);
 
   String retVal = "";
   await ipv4Interfaces.then((List<NetworkInterface> interfaces) {
@@ -104,4 +95,3 @@ String getFileSize(Uint8List bytes) {
     return '${gbSize.toStringAsFixed(2)} GB';
   }
 }
-

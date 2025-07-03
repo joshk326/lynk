@@ -36,8 +36,7 @@ class _ClientDashboardState extends State<ClientDashboard> {
     text: _ipInputClient.isNotEmpty ? _ipInputClient : "",
   );
 
-  var portTxtContr = TextEditingController(
-      text: _portInputClient.isNotEmpty ? _portInputClient : "");
+  var portTxtContr = TextEditingController(text: _portInputClient.isNotEmpty ? _portInputClient : "");
 
   @override
   void initState() {
@@ -57,8 +56,7 @@ class _ClientDashboardState extends State<ClientDashboard> {
               padding: const EdgeInsets.only(bottom: 19),
               child: Container(
                 constraints: const BoxConstraints(maxWidth: 650),
-                padding:
-                    const EdgeInsets.symmetric(vertical: 20, horizontal: 50),
+                padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 50),
                 decoration: BoxDecoration(
                     color: background,
                     border: Border.all(color: flatBlack),
@@ -69,8 +67,7 @@ class _ClientDashboardState extends State<ClientDashboard> {
                       controller: ipTxtContr,
                       enabled: !clientConnected,
                       maxLength: 15,
-                      decoration: const InputDecoration(
-                          labelText: "Server IP", counterText: ""),
+                      decoration: const InputDecoration(labelText: "Server IP", counterText: ""),
                       onChanged: (value) {
                         setState(() {
                           _ipInputClient = value;
@@ -81,11 +78,8 @@ class _ClientDashboardState extends State<ClientDashboard> {
                       controller: portTxtContr,
                       enabled: !clientConnected,
                       maxLength: 5,
-                      decoration: const InputDecoration(
-                          labelText: "Server Port", counterText: ""),
-                      inputFormatters: <TextInputFormatter>[
-                        FilteringTextInputFormatter.digitsOnly
-                      ],
+                      decoration: const InputDecoration(labelText: "Server Port", counterText: ""),
+                      inputFormatters: <TextInputFormatter>[FilteringTextInputFormatter.digitsOnly],
                       onChanged: (value) {
                         setState(() {
                           _portInputClient = value;
@@ -112,20 +106,16 @@ class _ClientDashboardState extends State<ClientDashboard> {
                 margin: const EdgeInsets.only(top: 20, right: 15),
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                    border: Border.all(color: flatBlack),
-                    borderRadius: const BorderRadius.all(Radius.circular(20))),
+                    border: Border.all(color: flatBlack), borderRadius: const BorderRadius.all(Radius.circular(20))),
                 child: Column(
                   children: [
-                    IconButton(
-                        onPressed: () => _selectFile(),
-                        icon: const Icon(Icons.add)),
+                    IconButton(onPressed: () => _selectFile(), icon: const Icon(Icons.add)),
                     Expanded(
                         child: _fileData.isNotEmpty
                             ? ListView.builder(
                                 itemCount: _fileData.length,
                                 itemBuilder: (context, index) {
-                                  String fileName =
-                                      _fileData.keys.elementAt(index);
+                                  String fileName = _fileData.keys.elementAt(index);
                                   return ListTile(
                                     leading: const Icon(Icons.file_present),
                                     title: Text(fileName),
@@ -134,20 +124,14 @@ class _ClientDashboardState extends State<ClientDashboard> {
                                       children: [
                                         IconButton(
                                           onPressed: () async {
-                                            String fileData =
-                                                _fileData[fileName]!;
-                                            await _client!
-                                                .sendMessage(createJsonMessage(
+                                            String fileData = _fileData[fileName]!;
+                                            await _client!.sendMessage(createJsonMessage(
                                               metadata: _client!.name,
                                               fileName: fileName,
                                               fileContent: fileData,
                                             ));
                                             createDialogPopUp(
-                                                context.mounted
-                                                    ? context
-                                                    : null,
-                                                "Sent",
-                                                "File sent to server!");
+                                                context.mounted ? context : null, "Sent", "File sent to server!");
                                           },
                                           icon: const Icon(Icons.send),
                                         ),
@@ -179,9 +163,7 @@ class _ClientDashboardState extends State<ClientDashboard> {
   }
 
   Future<void> _connect() async {
-    if (!clientConnected &&
-        (_ipInputClient.isNotEmpty) &&
-        (_portInputClient.isNotEmpty)) {
+    if (!clientConnected && (_ipInputClient.isNotEmpty) && (_portInputClient.isNotEmpty)) {
       if ((validateIP(_ipInputClient)) && validatePort(_portInputClient)) {
         setState(() {
           _serverAddr = Address(_ipInputClient, int.parse(_portInputClient));
@@ -198,8 +180,7 @@ class _ClientDashboardState extends State<ClientDashboard> {
             _connectBtnColor = Colors.red;
           });
         } catch (e) {
-          createDialogPopUp(context.mounted ? context : null, "Error",
-              "Connection failed: $e");
+          createDialogPopUp(context.mounted ? context : null, "Error", "Connection failed: $e");
         }
       } else {
         createDialogPopUp(context, "Error", "Invalid ip or port format");
@@ -219,8 +200,7 @@ class _ClientDashboardState extends State<ClientDashboard> {
       if (_client != null) {
         // Send heartbeat message
         if (!_client!.isConnected()) {
-          createDialogPopUp(
-              context, "Disconnected", "The server conenction has closed.");
+          createDialogPopUp(context, "Disconnected", "The server conenction has closed.");
           setState(() {
             clientConnected = false;
           });

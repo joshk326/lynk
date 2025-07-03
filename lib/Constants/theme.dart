@@ -25,35 +25,30 @@ ThemeData appTheme = ThemeData(
       selectedItemColor: darkGreen,
       unselectedItemColor: lightGreen,
     ),
-    textSelectionTheme: TextSelectionThemeData(
-        selectionColor: lightGreen, cursorColor: flatBlack),
+    textSelectionTheme: TextSelectionThemeData(selectionColor: lightGreen, cursorColor: flatBlack),
     elevatedButtonTheme: ElevatedButtonThemeData(
         style: ButtonStyle(
             backgroundColor: WidgetStatePropertyAll(darkGreen),
             foregroundColor: WidgetStatePropertyAll(background),
-            shape: const WidgetStatePropertyAll(RoundedRectangleBorder(
-                borderRadius: BorderRadius.all(Radius.circular(5)))))),
+            shape: const WidgetStatePropertyAll(
+                RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(5)))))),
     inputDecorationTheme: InputDecorationTheme(
         labelStyle: TextStyle(color: flatBlack),
         focusColor: darkGreen,
-        focusedBorder:
-            UnderlineInputBorder(borderSide: BorderSide(color: darkGreen))),
+        focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: darkGreen))),
     scrollbarTheme: ScrollbarThemeData(
-        thumbColor: WidgetStatePropertyAll(darkGreen),
-        thumbVisibility: const WidgetStatePropertyAll(true)),
+        thumbColor: WidgetStatePropertyAll(darkGreen), thumbVisibility: const WidgetStatePropertyAll(true)),
     appBarTheme: AppBarTheme(
       backgroundColor: lightGreen,
     ),
     textButtonTheme: TextButtonThemeData(
         style: ButtonStyle(
-            foregroundColor: WidgetStatePropertyAll(flatBlack),
-            overlayColor: WidgetStatePropertyAll(lightGreen))),
+            foregroundColor: WidgetStatePropertyAll(flatBlack), overlayColor: WidgetStatePropertyAll(lightGreen))),
     dialogTheme: DialogTheme(
       backgroundColor: background,
     ),
     hoverColor: lightGrey,
-    floatingActionButtonTheme: FloatingActionButtonThemeData(
-        backgroundColor: darkGreen, foregroundColor: white),
+    floatingActionButtonTheme: FloatingActionButtonThemeData(backgroundColor: darkGreen, foregroundColor: white),
     switchTheme: SwitchThemeData(
         trackColor: WidgetStateProperty.resolveWith((states) {
           return states.contains(WidgetState.selected) ? lightGreen : flatRed;

@@ -27,8 +27,7 @@ Future<void> createDialogPopUp(context, String title, String text) async {
   );
 }
 
-Future<void> createConfirmDeleteDialogPopUp(
-    BuildContext context, VoidCallback onConfirm) async {
+Future<void> createConfirmDeleteDialogPopUp(BuildContext context, VoidCallback onConfirm) async {
   return showDialog<void>(
     context: context,
     barrierDismissible: false,

@@ -22,11 +22,7 @@ class _NavigationState extends State<Navigation> {
   double _navWidth = 200;
   @override
   Widget build(BuildContext context) {
-    final screens = [
-      const ServerDashboard(),
-      const ClientDashboard(),
-      Settings(nav: this)
-    ];
+    final screens = [const ServerDashboard(), const ClientDashboard(), Settings(nav: this)];
 
     return Scaffold(
       extendBody: true,
@@ -39,9 +35,7 @@ class _NavigationState extends State<Navigation> {
               children: screens,
             ),
       bottomNavigationBar:
-          (Platform.isMacOS || Platform.isWindows || Platform.isLinux)
-              ? const SizedBox.shrink()
-              : mobileNavigation(),
+          (Platform.isMacOS || Platform.isWindows || Platform.isLinux) ? const SizedBox.shrink() : mobileNavigation(),
     );
   }
 
@@ -52,8 +46,7 @@ class _NavigationState extends State<Navigation> {
           height: double.infinity,
           width: _navWidth,
           color: flatBlack,
-          child: LayoutBuilder(
-              builder: (BuildContext context, BoxConstraints constraints) {
+          child: LayoutBuilder(builder: (BuildContext context, BoxConstraints constraints) {
             return Column(
               mainAxisSize: MainAxisSize.max,
               children: [
@@ -68,28 +61,24 @@ class _NavigationState extends State<Navigation> {
                         width: double.infinity,
                         height: 150,
                         margin: const EdgeInsets.only(bottom: 20),
-                        child: const Image(
-                            image: AssetImage('assets/images/logo.png')),
+                        child: const Image(image: AssetImage('assets/images/logo.png')),
                       ),
                       // Nav Buttons
                       Column(
                         children: [
-                          creatNavButton(context, "Server", 0, Icons.router,
-                              () {
+                          creatNavButton(context, "Server", 0, Icons.router, () {
                             clientConnected
-                                ? createDialogPopUp(context, "Lynk",
-                                    "Unable to access server dashboard while client is connected")
+                                ? createDialogPopUp(
+                                    context, "Lynk", "Unable to access server dashboard while client is connected")
                                 : screenChange(0);
                           }),
-                          creatNavButton(context, "Client", 1,
-                              Icons.connect_without_contact, () {
+                          creatNavButton(context, "Client", 1, Icons.connect_without_contact, () {
                             serverRunning
-                                ? createDialogPopUp(context, "Lynk",
-                                    "Unable to access client dashboard while server is running")
+                                ? createDialogPopUp(
+                                    context, "Lynk", "Unable to access client dashboard while server is running")
                                 : screenChange(1);
                           }),
-                          creatNavButton(context, "Settings", 2, Icons.settings,
-                              () {
+                          creatNavButton(context, "Settings", 2, Icons.settings, () {
                             screenChange(2);
                           }),
                         ],
@@ -98,11 +87,7 @@ class _NavigationState extends State<Navigation> {
                   ),
                 ),
                 // Nav Close Button
-                SizedBox(
-                    width: 10,
-                    height: _navHidden
-                        ? (MediaQuery.sizeOf(context).height / 2) - 30
-                        : 0),
+                SizedBox(width: 10, height: _navHidden ? (MediaQuery.sizeOf(context).height / 2) - 30 : 0),
                 IconButton(
                   onPressed: () {
                     setState(() {
@@ -116,9 +101,7 @@ class _NavigationState extends State<Navigation> {
                     });
                   },
                   icon: Icon(
-                    !_navHidden
-                        ? Icons.keyboard_double_arrow_left
-                        : Icons.keyboard_double_arrow_right,
+                    !_navHidden ? Icons.keyboard_double_arrow_left : Icons.keyboard_double_arrow_right,
                     color: lightGreen,
                     size: 30,
                   ),
@@ -148,12 +131,10 @@ class _NavigationState extends State<Navigation> {
           showUnselectedLabels: true,
           onTap: (index) {
             if (clientConnected && (index == 0)) {
-              createDialogPopUp(context, "Lynk",
-                  "Unable to access server dashboard while client is connected");
+              createDialogPopUp(context, "Lynk", "Unable to access server dashboard while client is connected");
               return;
             } else if (serverRunning && (index == 1)) {
-              createDialogPopUp(context, "Lynk",
-                  "Unable to access client dashboard while server is running");
+              createDialogPopUp(context, "Lynk", "Unable to access client dashboard while server is running");
               return;
             }
             screenChange(index);
@@ -183,8 +164,7 @@ class _NavigationState extends State<Navigation> {
     );
   }
 
-  TextButton creatNavButton(BuildContext context, String label, int navIndex,
-      IconData icon, Function callback) {
+  TextButton creatNavButton(BuildContext context, String label, int navIndex, IconData icon, Function callback) {
     return TextButton.icon(
       iconAlignment: IconAlignment.start,
       icon: Icon(
@@ -204,9 +184,8 @@ class _NavigationState extends State<Navigation> {
             ),
       style: ButtonStyle(
           padding: const WidgetStatePropertyAll(EdgeInsets.zero),
-          foregroundColor: _currentIndex == navIndex
-              ? WidgetStatePropertyAll(darkGreen)
-              : WidgetStatePropertyAll(lightGreen),
+          foregroundColor:
+              _currentIndex == navIndex ? WidgetStatePropertyAll(darkGreen) : WidgetStatePropertyAll(lightGreen),
           overlayColor: const WidgetStatePropertyAll(Colors.transparent)),
     );
   }
