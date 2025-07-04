@@ -79,6 +79,7 @@ class _ServerDashboardState extends State<ServerDashboard> {
                   Container(
                     constraints: const BoxConstraints(maxWidth: 650),
                     padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 50),
+                    margin: const EdgeInsets.symmetric(horizontal: 10),
                     decoration: BoxDecoration(
                         color: background,
                         border: Border.all(color: flatBlack),
@@ -150,6 +151,7 @@ class _ServerDashboardState extends State<ServerDashboard> {
                               height: 200,
                               width: 650,
                               padding: const EdgeInsets.all(20),
+                              margin: const EdgeInsets.symmetric(horizontal: 10),
                               decoration: BoxDecoration(
                                   border: Border.all(color: flatBlack),
                                   borderRadius: const BorderRadius.all(Radius.circular(20))),

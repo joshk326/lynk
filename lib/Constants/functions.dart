@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
-import 'dart:typed_data';
+import 'package:flutter/foundation.dart';
 import 'package:path/path.dart' as p;
 
 bool validateIP(var input) {
@@ -64,20 +64,23 @@ Map decodeJsonMessage(String jsonString) {
 }
 
 Future<String> getLocalIPV4() async {
-  Future<List<NetworkInterface>> ipv4Interfaces = NetworkInterface.list(type: InternetAddressType.IPv4);
+  try {
+    List<NetworkInterface> interfaces = await NetworkInterface.list(type: InternetAddressType.IPv4);
 
-  String retVal = "";
-  await ipv4Interfaces.then((List<NetworkInterface> interfaces) {
     for (var interface in interfaces) {
       for (var address in interface.addresses) {
-        if (interface.name == "Wi-Fi") {
-          retVal = address.address;
+        if (!address.isLoopback) {
+          return address.address;
         }
       }
     }
-  });
-
-  return retVal;
+    return "";
+  } catch (e) {
+    if (kDebugMode) {
+      print("Error: $e");
+    }
+    return "";
+  }
 }
 
 String getFileSize(String source) {
