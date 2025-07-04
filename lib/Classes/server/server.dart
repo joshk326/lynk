@@ -64,8 +64,12 @@ class Server {
   Optional<Message> _decodeMsg(String data) {
     if (data.isNotEmpty) {
       Map tmp = decodeJsonMessage(data);
-      return Optional.of(Message(DateTime.parse(tmp["message"]["date"]), tmp["metadata"]["message"],
-          tmp["message"]["file_name"], tmp["message"]["contents"]));
+      Message tmpMsg = Message(
+          date: DateTime.parse(tmp["message"]["date"]),
+          sender: tmp["metadata"]["message"],
+          message: tmp["message"]["file_name"],
+          content: tmp["message"]["contents"]);
+      return Optional.of(tmpMsg);
     } else {
       return const Optional.empty();
     }
@@ -76,13 +80,13 @@ class Server {
     if (!toSender) {
       for (Socket c in _clients.keys) {
         if (c != sender && message != _clients[sender]) {
-          broadcast = Message(DateTime.now(), _clients[sender]!, message, "");
+          broadcast = Message(date: DateTime.now(), sender: _clients[sender]!, message: message, content: "");
           c.write(createJsonMessage(metadata: broadcast.toString()));
           _messages.add(broadcast);
         }
       }
     } else {
-      broadcast = Message(DateTime.now(), "Server", message, "");
+      broadcast = Message(date: DateTime.now(), sender: "Server", message: message, content: "");
       sender.write(createJsonMessage(metadata: broadcast.toString()));
     }
   }

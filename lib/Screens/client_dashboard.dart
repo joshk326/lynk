@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:app/Classes/server/server.dart';
+import 'package:flutter/foundation.dart';
 import 'package:path/path.dart' as p;
 
 import 'package:app/Classes/server/address.dart';
@@ -23,6 +24,7 @@ Address? _serverAddr;
 Client? _client;
 Map<String, String> _fileData = {};
 late Timer _heartBeatTimer;
+bool sending = false;
 
 class ClientDashboard extends StatefulWidget {
   const ClientDashboard({super.key});
@@ -93,6 +95,7 @@ class _ClientDashboardState extends State<ClientDashboard> {
                       icon: _connectBtnIcon,
                       color: _connectBtnColor,
                       onPressed: () => _connect(),
+                      tooltip: !clientConnected ? "Connect to Server" : "Disconnect from Server",
                     ),
                   ],
                 ),
@@ -112,39 +115,34 @@ class _ClientDashboardState extends State<ClientDashboard> {
                     IconButton(onPressed: () => _selectFile(), icon: const Icon(Icons.add)),
                     Expanded(
                         child: _fileData.isNotEmpty
-                            ? ListView.builder(
-                                itemCount: _fileData.length,
-                                itemBuilder: (context, index) {
-                                  String fileName = _fileData.keys.elementAt(index);
-                                  return ListTile(
-                                    leading: const Icon(Icons.file_present),
-                                    title: Text(fileName),
-                                    trailing: Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        IconButton(
-                                          onPressed: () async {
-                                            String fileData = _fileData[fileName]!;
-                                            await _client!.sendMessage(createJsonMessage(
-                                              metadata: _client!.name,
-                                              fileName: fileName,
-                                              fileContent: fileData,
-                                            ));
-                                            createDialogPopUp(
-                                                context.mounted ? context : null, "Sent", "File sent to server!");
-                                          },
-                                          icon: const Icon(Icons.send),
+                            ? AbsorbPointer(
+                                absorbing: sending,
+                                child: ListView.builder(
+                                    itemCount: _fileData.length,
+                                    itemBuilder: (context, index) {
+                                      String fileName = _fileData.keys.elementAt(index);
+                                      return ListTile(
+                                        enabled: !sending,
+                                        leading: const Icon(Icons.file_present),
+                                        title: Text(fileName),
+                                        trailing: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            IconButton(
+                                              onPressed: () => _sendFile(fileName),
+                                              icon: sending ? const Icon(Icons.hourglass_full) : const Icon(Icons.send),
+                                            ),
+                                            IconButton(
+                                              onPressed: () {
+                                                _deleteFile(fileName);
+                                              },
+                                              icon: const Icon(Icons.delete),
+                                            ),
+                                          ],
                                         ),
-                                        IconButton(
-                                          onPressed: () {
-                                            _deleteFile(fileName);
-                                          },
-                                          icon: const Icon(Icons.delete),
-                                        ),
-                                      ],
-                                    ),
-                                  );
-                                })
+                                      );
+                                    }),
+                              )
                             : const Text("No Files Added")),
                   ],
                 ),
@@ -196,7 +194,7 @@ class _ClientDashboardState extends State<ClientDashboard> {
   }
 
   void _startConnectionCheck() {
-    _heartBeatTimer = Timer.periodic(const Duration(seconds: 5), (timer) {
+    _heartBeatTimer = Timer.periodic(const Duration(seconds: 5), (timer) async {
       if (_client != null) {
         // Send heartbeat message
         if (!_client!.isConnected()) {
@@ -206,7 +204,7 @@ class _ClientDashboardState extends State<ClientDashboard> {
           });
           _resetClient();
         } else {
-          _client!.sendMessage(createJsonMessage(metadata: heartBeat));
+          await _client!.sendMessage(createJsonMessage(metadata: heartBeat));
         }
       }
     });
@@ -232,14 +230,40 @@ class _ClientDashboardState extends State<ClientDashboard> {
   Future<void> _selectFile() async {
     FilePickerResult? result = await FilePicker.platform.pickFiles();
     if (result != null) {
-      File file = File(result.files.single.path!);
-      Uint8List bytes = file.readAsBytesSync();
-      String fileData = base64Encode(bytes);
-      String fileName = p.basename(file.path);
+      String filePath = result.files.single.path!;
+
+      Map<String, String> processedFile = await compute(processFile, filePath);
+
       setState(() {
-        _fileData[fileName] = fileData;
+        _fileData[processedFile['fileName']!] = processedFile['fileData']!;
       });
     }
+  }
+
+  Future<void> _sendFile(String fileName) async {
+    setState(() {
+      sending = true;
+    });
+
+    // Stop the heartbeat check to ensure the stream is cleared
+    _stopConnectionCheck();
+
+    await Future.delayed(const Duration(milliseconds: 100));
+
+    String fileData = _fileData[fileName]!;
+    await _client!.sendMessage(createJsonMessage(
+      metadata: _client!.name,
+      fileName: fileName,
+      fileContent: fileData,
+    ));
+
+    createDialogPopUp(context.mounted ? context : null, "Sent", "$fileName sent to server!");
+
+    setState(() {
+      sending = false;
+    });
+    //Start the heartbeat check
+    _startConnectionCheck();
   }
 
   void _deleteFile(String fileName) {
