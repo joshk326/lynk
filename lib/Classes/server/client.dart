@@ -44,8 +44,11 @@ class Client {
     int length = jsonBytes.length;
     ByteData lengthBytes = ByteData(4)..setUint32(0, length, Endian.big);
 
-    socket.add(lengthBytes.buffer.asUint8List());
-    socket.add(jsonBytes);
+    var lengthStream = Stream.value(lengthBytes.buffer.asUint8List());
+    var jsonByteStream = Stream.value(jsonBytes);
+
+    await socket.addStream(lengthStream);
+    await socket.addStream(jsonByteStream);
     await socket.flush();
   }
 
