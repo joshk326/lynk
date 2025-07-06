@@ -1,9 +1,9 @@
 import 'dart:convert';
 import 'dart:io';
-import 'dart:typed_data';
 
 import 'package:app/Classes/server/init.dart';
 import 'package:app/Constants/functions.dart';
+import 'package:flutter/foundation.dart';
 
 class Client {
   late String name;
@@ -17,12 +17,17 @@ class Client {
   }
 
   Future<void> connect() async {
-    socket = await SecureSocket.connect(_host.ip(), _host.port(), onBadCertificate: (X509Certificate certificate) {
-      // Accept self signed certificate
-      return true;
-    }).catchError((error) {
-      print("Error: $error");
-    });
+    try {
+      socket = await SecureSocket.connect(_host.ip(), _host.port(), onBadCertificate: (X509Certificate certificate) {
+        // Accept self signed certificate
+        return true;
+      });
+    } catch (e) {
+      if (kDebugMode) {
+        print("Error: $e");
+      }
+      return;
+    }
 
     _connected = true;
 

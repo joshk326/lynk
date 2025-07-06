@@ -37,10 +37,13 @@ class Server {
       ..useCertificateChainBytes(certificateBytes)
       ..usePrivateKeyBytes(keyBytes);
 
-    _server = await SecureServerSocket.bind(address.ip(), address.port(), serverContext).catchError((error) {
+    try {
+      _server = await SecureServerSocket.bind(address.ip(), address.port(), serverContext);
+    } catch (e) {
       _writeConsole(serverErrors['CONN_ERR']!);
       _running = false;
-    });
+      return;
+    }
 
     _writeConsole("${DateTime.now()} - Server is running on: ${address.ip()}:${address.port()}");
     _server.listen((SecureSocket client) {
