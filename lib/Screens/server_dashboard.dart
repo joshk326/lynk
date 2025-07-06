@@ -25,7 +25,7 @@ bool _clientsShown = false;
 bool _messagesShown = false;
 String _clientCount = "0";
 String _fileCount = "0";
-Map<Socket, String> _clients = {};
+Map<SecureSocket, String> _clients = {};
 List<Message> _serverMessages = [];
 late Timer _countsTimer;
 bool _downloading = false;

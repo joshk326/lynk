@@ -5,6 +5,7 @@ import 'package:app/Classes/server/address.dart';
 import 'package:app/Classes/server/message.dart';
 import 'package:app/Constants/functions.dart';
 import 'package:flutter/foundation.dart' show kDebugMode;
+import 'package:flutter/services.dart' show rootBundle;
 import 'package:optional/optional.dart';
 
 final Map<String, String> serverErrors = {'CONN_ERR': 'Failed to bind to given address and port'};
@@ -20,25 +21,29 @@ final Map<Socket, _ClientBuffer> _buffers = {};
 
 class Server {
   late Address address;
-  late ServerSocket _server;
+  late SecureServerSocket _server;
   final List<String> _consoleOutput = [];
-  final Map<Socket, String> _clients = {};
+  final Map<SecureSocket, String> _clients = {};
   final List<Message> _messages = [];
   late bool _running;
 
   Server(this.address);
 
   Future<void> _createSocket() async {
-    try {
-      _server = await ServerSocket.bind(address.ip(), address.port());
-    } on SocketException {
+    final certificateBytes = (await rootBundle.load('assets/security/dev_server_cert.pem')).buffer.asUint8List();
+    final keyBytes = (await rootBundle.load('assets/security/dev_server_key.pem')).buffer.asUint8List();
+
+    final SecurityContext serverContext = SecurityContext()
+      ..useCertificateChainBytes(certificateBytes)
+      ..usePrivateKeyBytes(keyBytes);
+
+    _server = await SecureServerSocket.bind(address.ip(), address.port(), serverContext).catchError((error) {
       _writeConsole(serverErrors['CONN_ERR']!);
       _running = false;
-      return;
-    }
+    });
 
     _writeConsole("${DateTime.now()} - Server is running on: ${address.ip()}:${address.port()}");
-    _server.listen((Socket client) {
+    _server.listen((SecureSocket client) {
       _handleConnection(client);
     });
   }
@@ -52,8 +57,8 @@ class Server {
     }
   }
 
-  bool _checkClientExists(Socket client) {
-    for (Socket item in _clients.keys) {
+  bool _checkClientExists(SecureSocket client) {
+    for (SecureSocket item in _clients.keys) {
       if (item == client) {
         return true;
       }
@@ -91,7 +96,7 @@ class Server {
     }
   }
 
-  void _handleConnection(Socket client) {
+  void _handleConnection(SecureSocket client) {
     _writeConsole("${DateTime.now()} - Server: Connection from ${client.address}:${client.remotePort}");
 
     _buffers[client] = _ClientBuffer();
@@ -152,7 +157,7 @@ class Server {
     return _consoleOutput;
   }
 
-  Map<Socket, String> getClients() {
+  Map<SecureSocket, String> getClients() {
     return _clients;
   }
 

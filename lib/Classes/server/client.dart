@@ -7,7 +7,7 @@ import 'package:app/Constants/functions.dart';
 
 class Client {
   late String name;
-  late Socket socket;
+  late SecureSocket socket;
   late Address _host;
   late bool _connected;
   Client(Address host) {
@@ -17,11 +17,13 @@ class Client {
   }
 
   Future<void> connect() async {
-    try {
-      socket = await Socket.connect(_host.ip(), _host.port());
-    } catch (ex) {
-      return;
-    }
+    socket = await SecureSocket.connect(_host.ip(), _host.port(), onBadCertificate: (X509Certificate certificate) {
+      // Accept self signed certificate
+      return true;
+    }).catchError((error) {
+      print("Error: $error");
+    });
+
     _connected = true;
 
     // Sender client name back to server
@@ -52,7 +54,7 @@ class Client {
     await socket.flush();
   }
 
-  void _handleConnection(Socket client) {
+  void _handleConnection(SecureSocket client) {
     client.listen(
       (Uint8List data) async {
         String msg = decodeJsonMessage(String.fromCharCodes(data))["metadata"]["message"];

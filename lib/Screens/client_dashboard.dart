@@ -161,7 +161,7 @@ class _ClientDashboardState extends State<ClientDashboard> {
     if (!clientConnected && (_ipInputClient.isNotEmpty) && (_portInputClient.isNotEmpty)) {
       if ((validateIP(_ipInputClient)) && validatePort(_portInputClient)) {
         setState(() {
-          _serverAddr = Address(_ipInputClient, int.parse(_portInputClient));
+          _serverAddr = Address(_ipInputClient.trim(), int.parse(_portInputClient.trim()));
           _client = Client(_serverAddr!);
         });
         try {
@@ -175,12 +175,12 @@ class _ClientDashboardState extends State<ClientDashboard> {
             _connectBtnColor = Colors.red;
           });
         } catch (e) {
-          createDialogPopUp(context.mounted ? context : null, "Error", "Connection failed: $e");
+          createDialogPopUp(context.mounted ? context : null, "Error", "Connection failed");
         }
       } else {
         createDialogPopUp(context, "Error", "Invalid ip or port format");
       }
-    } else if (clientConnected && _client != null) {
+    } else if ((clientConnected && _client != null)) {
       setState(() {
         clientConnected = false;
       });
@@ -192,17 +192,12 @@ class _ClientDashboardState extends State<ClientDashboard> {
 
   void _startConnectionCheck() {
     _heartBeatTimer = Timer.periodic(const Duration(seconds: 5), (timer) async {
-      if (_client != null) {
-        // Send heartbeat message
-        if (!_client!.isConnected()) {
-          createDialogPopUp(context, "Disconnected", "The server conenction has closed.");
-          setState(() {
-            clientConnected = false;
-          });
-          _resetClient();
-        } else {
-          await _client!.sendMessage(createJsonMessage(metadata: heartBeat));
-        }
+      // Send heartbeat message
+      if (!_client!.isConnected() || _client == null) {
+        _resetClient();
+        createDialogPopUp(context, "Disconnected", "The server conenction has closed.");
+      } else {
+        await _client!.sendMessage(createJsonMessage(metadata: heartBeat));
       }
     });
   }
@@ -214,8 +209,12 @@ class _ClientDashboardState extends State<ClientDashboard> {
   }
 
   void _resetClient() {
-    setState(() {
+    if (_client != null) {
       _client!.disconnect();
+    }
+
+    setState(() {
+      clientConnected = false;
       _client = null;
       _connectBtnIcon = const Icon(Icons.link);
       _connectBtnColor = darkGreen;
