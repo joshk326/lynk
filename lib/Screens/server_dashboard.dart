@@ -11,6 +11,7 @@ import 'package:app/Classes/server/init.dart';
 import 'package:app/Constants/functions.dart';
 import 'package:app/Constants/theme.dart';
 import 'package:app/Widgets/alert.dart';
+import 'package:hive/hive.dart';
 
 // Global variables
 String _serverIP = "";
@@ -242,7 +243,7 @@ class _ServerDashboardState extends State<ServerDashboard> {
                           child: FutureBuilder(
                               future: _getServerMessages(),
                               builder: (context, snapshot) {
-                                if (serverRunning && _serverMessages.isNotEmpty) {
+                                if (serverRunning && box.values.isNotEmpty) {
                                   return Center(
                                     child: Container(
                                       padding: const EdgeInsets.all(20),
@@ -252,14 +253,16 @@ class _ServerDashboardState extends State<ServerDashboard> {
                                       child: AbsorbPointer(
                                         absorbing: _downloading,
                                         child: ListView.builder(
-                                          itemCount: _serverMessages.length,
+                                          itemCount: box.values.length,
                                           itemBuilder: (context, index) {
-                                            final message = _serverMessages.elementAt(index);
+                                            final messageSender = box.values.elementAt(index).sender;
+                                            final messageFileSize = box.values.elementAt(index).fileSize;
+                                            final messageTitle = box.values.elementAt(index).message;
                                             return ListTile(
                                               enabled: !_downloading,
                                               leading: const Icon(Icons.file_present),
-                                              subtitle: Text("From: ${message.sender}, Size: ${message.fileSize}"),
-                                              title: Text(message.message),
+                                              subtitle: Text("From: ${messageSender}, Size: ${messageFileSize}"),
+                                              title: Text(messageTitle),
                                               trailing: Row(
                                                 mainAxisSize: MainAxisSize.min,
                                                 children: [
@@ -272,7 +275,7 @@ class _ServerDashboardState extends State<ServerDashboard> {
                                                     onPressed: () {
                                                       createConfirmDeleteDialogPopUp(context, () {
                                                         setState(() {
-                                                          _serverMessages.removeAt(index);
+                                                          box.deleteAt(index);
                                                         });
                                                       });
                                                     },
@@ -394,6 +397,11 @@ class _ServerDashboardState extends State<ServerDashboard> {
       setState(() {
         serverRunning = false;
       });
+
+      // Remove database of files
+      box.deleteFromDisk();
+      Hive.close();
+
       setState(() {
         _serverBtnIcon = const Icon(Icons.play_arrow);
         _serverBtnColor = darkGreen;
@@ -442,9 +450,9 @@ class _ServerDashboardState extends State<ServerDashboard> {
 
   Future<void> _getServerMessages() async {
     if (serverRunning) {
+      box = await Hive.openBox('msg_box');
       setState(() {
-        _serverMessages = _server!.getMessages();
-        _fileCount = _serverMessages.length.toString();
+        _fileCount = box.values.length.toString();
       });
     }
   }
@@ -471,7 +479,7 @@ class _ServerDashboardState extends State<ServerDashboard> {
 
     await Future.delayed(const Duration(milliseconds: 50));
 
-    final message = _serverMessages.elementAt(index);
+    final message = box.getAt(index);
 
     String? outputFile = await FilePicker.platform.saveFile(
         dialogTitle: 'Please select an output file:',

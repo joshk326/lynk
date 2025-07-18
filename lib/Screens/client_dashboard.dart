@@ -166,17 +166,18 @@ class _ClientDashboardState extends State<ClientDashboard> {
         });
         try {
           await _client!.connect();
-
-          _startConnectionCheck();
-
-          setState(() {
-            clientConnected = !clientConnected;
-            _connectBtnIcon = const Icon(Icons.link_off);
-            _connectBtnColor = Colors.red;
-          });
         } catch (e) {
           createDialogPopUp(context.mounted ? context : null, "Error", "Connection failed");
+          return;
         }
+
+        _startConnectionCheck();
+
+        setState(() {
+          clientConnected = !clientConnected;
+          _connectBtnIcon = const Icon(Icons.link_off);
+          _connectBtnColor = Colors.red;
+        });
       } else {
         createDialogPopUp(context, "Error", "Invalid ip or port format");
       }

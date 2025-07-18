@@ -4,8 +4,10 @@ import 'dart:typed_data';
 import 'package:app/Classes/server/address.dart';
 import 'package:app/Classes/server/message.dart';
 import 'package:app/Constants/functions.dart';
+import 'package:app/Constants/variables.dart';
 import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter/services.dart' show rootBundle;
+import 'package:hive/hive.dart';
 import 'package:optional/optional.dart';
 
 final Map<String, String> serverErrors = {'CONN_ERR': 'Failed to bind to given address and port'};
@@ -131,7 +133,7 @@ class Server {
 
               if (tmp.isPresent) {
                 if (!tmp.value.sender.contains(heartBeat)) {
-                  _messages.add(tmp.value);
+                  await box.add(tmp.value);
                   String fileName = tmp.value.message;
                   _writeConsole("Received: $fileName");
                 } else {
@@ -150,10 +152,6 @@ class Server {
         _buffers.remove(client);
       },
     );
-  }
-
-  List<Message> getMessages() {
-    return _messages;
   }
 
   List<String> getConsoleOutput() {

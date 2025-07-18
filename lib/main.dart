@@ -1,10 +1,19 @@
+import 'package:app/Classes/server/message.dart';
 import 'package:app/Constants/theme.dart';
+import 'package:app/Constants/variables.dart';
 import 'package:app/navigation.dart';
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
+import 'package:path_provider/path_provider.dart' as path_provider;
 import 'package:window_manager/window_manager.dart';
-import 'dart:io' show Platform;
+import 'dart:io' show Directory, Platform;
 
 void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  Directory directory = await path_provider.getTemporaryDirectory();
+  Hive.init(directory.path);
+  Hive.registerAdapter(MessageAdapter());
+
   if (Platform.isLinux || Platform.isWindows || Platform.isMacOS) {
     WidgetsFlutterBinding.ensureInitialized();
     await windowManager.ensureInitialized();

@@ -17,17 +17,17 @@ class Client {
   }
 
   Future<void> connect() async {
-    try {
-      socket = await SecureSocket.connect(_host.ip(), _host.port(), onBadCertificate: (X509Certificate certificate) {
-        // Accept self signed certificate
-        return true;
-      });
-    } catch (e) {
-      if (kDebugMode) {
-        print("Error: $e");
-      }
-      return;
-    }
+    // try {
+    socket = await SecureSocket.connect(_host.ip(), _host.port(), onBadCertificate: (X509Certificate certificate) {
+      // Accept self signed certificate
+      return true;
+    });
+    // } catch (e) {
+    //   if (kDebugMode) {
+    //     print("Error: $e");
+    //   }
+    //   return;
+    // }
 
     _connected = true;
 
