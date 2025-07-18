@@ -7,7 +7,6 @@ import 'package:app/Constants/functions.dart';
 import 'package:app/Constants/variables.dart';
 import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter/services.dart' show rootBundle;
-import 'package:hive/hive.dart';
 import 'package:optional/optional.dart';
 
 final Map<String, String> serverErrors = {'CONN_ERR': 'Failed to bind to given address and port'};

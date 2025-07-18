@@ -261,7 +261,7 @@ class _ServerDashboardState extends State<ServerDashboard> {
                                             return ListTile(
                                               enabled: !_downloading,
                                               leading: const Icon(Icons.file_present),
-                                              subtitle: Text("From: ${messageSender}, Size: ${messageFileSize}"),
+                                              subtitle: Text("From: $messageSender, Size: $messageFileSize"),
                                               title: Text(messageTitle),
                                               trailing: Row(
                                                 mainAxisSize: MainAxisSize.min,

@@ -1,6 +1,5 @@
 import 'package:app/Classes/server/message.dart';
 import 'package:app/Constants/theme.dart';
-import 'package:app/Constants/variables.dart';
 import 'package:app/navigation.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
