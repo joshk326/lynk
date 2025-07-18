@@ -29,6 +29,10 @@ class _SettingsState extends State<Settings> {
             leading: const Text("Show Navigation Labels", style: TextStyle(fontSize: 15)),
             trailing: Switch(value: showNavLabels, onChanged: toggleNavLabels),
           ),
+          ListTile(
+            leading: const Text("Retain Server Received Files", style: TextStyle(fontSize: 15)),
+            trailing: Switch(value: saveReceivedFiles, onChanged: toggleSave),
+          ),
         ],
       ),
     ));
@@ -37,6 +41,12 @@ class _SettingsState extends State<Settings> {
   void toggleNavLabels(bool value) {
     widget.nav.setState(() {
       showNavLabels = value;
+    });
+  }
+
+  void toggleSave(bool value) {
+    widget.nav.setState(() {
+      saveReceivedFiles = value;
     });
   }
 }

@@ -61,5 +61,6 @@ Launch the app on two devices (or emulators) on the same local network. Use the 
 - ✅ ~~Transfer progress indicators~~
 - imporve mobile experience
 - ✅ ~~End-to-end file encryption~~
-- Persistent transfer history
+- ✅ ~~Persistent transfer history Server Side~~
+- Save settings using SharedPrefs
 - Web support (create websocket)
