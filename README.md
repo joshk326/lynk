@@ -12,8 +12,7 @@ Lynk is ideal for quick, local file transfers without relying on cloud services,
 
 ### ⚠️ Notes
 - Files are saved locally on the server device in a user defined directory.
-- The app is designed for trusted local networks only — it does not include built-in encryption or authentication.
-- For secure transfers on untrusted networks, use Lynk in conjunction with a VPN or encrypted tunnel.
+- The app is designed for trusted local networks.
 - Web is not supported due to limitations in Flutter's socket support for browsers.
 
 ---
