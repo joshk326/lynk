@@ -1,5 +1,7 @@
+import 'package:app/Classes/SettingsManager.dart';
 import 'package:app/Classes/server/message.dart';
 import 'package:app/Constants/theme.dart';
+import 'package:app/Constants/variables.dart';
 import 'package:app/navigation.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
@@ -33,15 +35,54 @@ void main() async {
   runApp(const App());
 }
 
-class App extends StatelessWidget {
+class App extends StatefulWidget {
   const App({super.key});
+
+  @override
+  State<App> createState() => _AppState();
+}
+
+class _AppState extends State<App> {
+  var _future;
+  Future<dynamic> _loadSettings() async {
+    if (_future == null) {
+      _future = await SettingsManager().readSettingsFile();
+      setState(() {
+        settingsObj = _future;
+      });
+    }
+    return _future;
+  }
+
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Lynk',
-      theme: appTheme,
-      home: const Navigation(),
-    );
+    return FutureBuilder(
+        future: _loadSettings(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return MaterialApp(
+                debugShowCheckedModeBanner: false,
+                title: 'Lynk',
+                theme: appTheme,
+                home: const Center(
+                  child: CircularProgressIndicator(),
+                ));
+          } else if (snapshot.hasError) {
+            return MaterialApp(
+                debugShowCheckedModeBanner: false,
+                title: 'Lynk',
+                theme: appTheme,
+                home: Center(
+                  child: Text('Error: ${snapshot.error}'),
+                ));
+          } else {
+            return MaterialApp(
+              debugShowCheckedModeBanner: false,
+              title: 'Lynk',
+              theme: appTheme,
+              home: const Navigation(),
+            );
+          }
+        });
   }
 }

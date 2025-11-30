@@ -127,7 +127,7 @@ class _NavigationState extends State<Navigation> {
           type: BottomNavigationBarType.fixed,
           enableFeedback: false,
           currentIndex: _currentIndex,
-          showSelectedLabels: showNavLabels,
+          showSelectedLabels: settingsObj["showNavLabels"],
           showUnselectedLabels: true,
           onTap: (index) {
             if (clientConnected && (index == 0)) {
@@ -144,19 +144,19 @@ class _NavigationState extends State<Navigation> {
               icon: const Icon(
                 Icons.router,
               ),
-              label: showNavLabels ? 'Server' : '',
+              label: (settingsObj["showNavLabels"] ?? true) ? 'Server' : '',
             ),
             BottomNavigationBarItem(
               icon: const Icon(
                 Icons.connect_without_contact,
               ),
-              label: showNavLabels ? 'Client' : '',
+              label: (settingsObj["showNavLabels"] ?? true) ? 'Client' : '',
             ),
             BottomNavigationBarItem(
               icon: const Icon(
                 Icons.settings,
               ),
-              label: showNavLabels ? 'Settings' : '',
+              label: (settingsObj["showNavLabels"] ?? true) ? 'Settings' : '',
             ),
           ],
         ),
@@ -177,7 +177,7 @@ class _NavigationState extends State<Navigation> {
           callback();
         });
       },
-      label: showNavLabels
+      label: (settingsObj["showNavLabels"] ?? true)
           ? Text(label)
           : const Text(
               "",

@@ -12,7 +12,7 @@ ThemeData appTheme = ThemeData(
     primaryColor: darkGreen,
     scaffoldBackgroundColor: background,
     highlightColor: lightGreen,
-    bottomAppBarTheme: BottomAppBarTheme(
+    bottomAppBarTheme: BottomAppBarThemeData(
       color: background,
       shape: const CircularNotchedRectangle(),
       elevation: 0,
@@ -44,7 +44,7 @@ ThemeData appTheme = ThemeData(
     textButtonTheme: TextButtonThemeData(
         style: ButtonStyle(
             foregroundColor: WidgetStatePropertyAll(flatBlack), overlayColor: WidgetStatePropertyAll(lightGreen))),
-    dialogTheme: DialogTheme(
+    dialogTheme: DialogThemeData(
       backgroundColor: background,
     ),
     hoverColor: lightGrey,

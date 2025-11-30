@@ -338,7 +338,7 @@ class _ServerDashboardState extends State<ServerDashboard> {
                   ),
                 )),
             Visibility(
-              visible: serverRunning || saveReceivedFiles,
+              visible: serverRunning || (settingsObj["saveReceivedFiles"] ?? false),
               child: Align(
                   alignment: (Platform.isWindows || Platform.isMacOS) ? Alignment.bottomLeft : Alignment.topLeft,
                   child: Padding(
@@ -399,7 +399,7 @@ class _ServerDashboardState extends State<ServerDashboard> {
       });
 
       // Remove database of files
-      if (!saveReceivedFiles) {
+      if (!(settingsObj["saveReceivedFiles"] ?? false)) {
         box.deleteFromDisk();
       }
       Hive.close();

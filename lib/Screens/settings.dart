@@ -1,3 +1,4 @@
+import 'package:app/Classes/SettingsManager.dart';
 import 'package:app/Constants/variables.dart';
 import 'package:flutter/material.dart';
 
@@ -27,11 +28,11 @@ class _SettingsState extends State<Settings> {
           const Divider(),
           ListTile(
             leading: const Text("Show Navigation Labels", style: TextStyle(fontSize: 15)),
-            trailing: Switch(value: showNavLabels, onChanged: toggleNavLabels),
+            trailing: Switch(value: settingsObj["showNavLabels"] ?? true, onChanged: toggleNavLabels),
           ),
           ListTile(
             leading: const Text("Retain Server Received Files", style: TextStyle(fontSize: 15)),
-            trailing: Switch(value: saveReceivedFiles, onChanged: toggleSave),
+            trailing: Switch(value: settingsObj["saveReceivedFiles"] ?? false, onChanged: toggleSave),
           ),
         ],
       ),
@@ -40,13 +41,16 @@ class _SettingsState extends State<Settings> {
 
   void toggleNavLabels(bool value) {
     widget.nav.setState(() {
-      showNavLabels = value;
+      settingsObj["showNavLabels"] = value;
+      SettingsManager().writeSettingsFile();
     });
+    
   }
 
   void toggleSave(bool value) {
     widget.nav.setState(() {
-      saveReceivedFiles = value;
+      settingsObj["saveReceivedFiles"] = value;
+      SettingsManager().writeSettingsFile();
     });
   }
 }

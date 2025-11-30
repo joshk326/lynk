@@ -59,8 +59,8 @@ Launch the app on two devices (or emulators) on the same local network. Use the 
 - ✅ ~~Add labels to tabs (Toggled in settings)~~
 - Finish settings page (add default connects, default save path)
 - ✅ ~~Transfer progress indicators~~
-- imporve mobile experience
+- improve mobile experience
 - ✅ ~~End-to-end file encryption~~
 - ✅ ~~Persistent transfer history Server Side~~
-- Save settings using SharedPrefs
+- ✅ ~~Save settings using SharedPrefs/json file~~
 - Web support (create websocket)
