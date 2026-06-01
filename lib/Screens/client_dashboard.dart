@@ -16,12 +16,16 @@ import 'package:flutter/services.dart';
 String _ipInputClient = "";
 String _portInputClient = "";
 Icon _connectBtnIcon = const Icon(Icons.link);
+String _connectBtnToolTip = "Connect to Server";
 Color _connectBtnColor = darkGreen;
 Address? _serverAddr;
 Client? _client;
 Map<String, String> _fileData = {};
+Set<String> _sentFileNames = {};
 late Timer _heartBeatTimer;
 bool sending = false;
+
+enum ConnectionStatus { connecting, connected, disconnect }
 
 class ClientDashboard extends StatefulWidget {
   const ClientDashboard({super.key});
@@ -92,7 +96,7 @@ class _ClientDashboardState extends State<ClientDashboard> {
                       icon: _connectBtnIcon,
                       color: _connectBtnColor,
                       onPressed: () => _connect(),
-                      tooltip: !clientConnected ? "Connect to Server" : "Disconnect from Server",
+                      tooltip: _connectBtnToolTip,
                     ),
                   ],
                 ),
@@ -126,8 +130,13 @@ class _ClientDashboardState extends State<ClientDashboard> {
                                           mainAxisSize: MainAxisSize.min,
                                           children: [
                                             IconButton(
-                                              onPressed: () => _sendFile(fileName),
-                                              icon: sending ? const Icon(Icons.hourglass_full) : const Icon(Icons.send),
+                                              onPressed: () =>
+                                                  _sentFileNames.contains(fileName) ? null : _sendFile(fileName),
+                                              icon: _sentFileNames.contains(fileName)
+                                                  ? const Icon(Icons.check)
+                                                  : sending
+                                                      ? const Icon(Icons.hourglass_full)
+                                                      : const Icon(Icons.send),
                                             ),
                                             IconButton(
                                               onPressed: () {
@@ -165,19 +174,16 @@ class _ClientDashboardState extends State<ClientDashboard> {
           _client = Client(_serverAddr!);
         });
         try {
+          _changeConnectStatus(ConnectionStatus.connecting);
           await _client!.connect();
         } catch (e) {
+          _changeConnectStatus(null);
           createDialogPopUp(context.mounted ? context : null, "Error", "Connection failed");
           return;
         }
 
         _startConnectionCheck();
-
-        setState(() {
-          clientConnected = !clientConnected;
-          _connectBtnIcon = const Icon(Icons.link_off);
-          _connectBtnColor = Colors.red;
-        });
+        _changeConnectStatus(ConnectionStatus.connected);
       } else {
         createDialogPopUp(context, "Error", "Invalid ip or port format");
       }
@@ -214,13 +220,7 @@ class _ClientDashboardState extends State<ClientDashboard> {
       _client!.disconnect();
     }
 
-    setState(() {
-      clientConnected = false;
-      _client = null;
-      _connectBtnIcon = const Icon(Icons.link);
-      _connectBtnColor = darkGreen;
-      _fileData.clear();
-    });
+    _changeConnectStatus(ConnectionStatus.disconnect);
     _stopConnectionCheck();
   }
 
@@ -258,6 +258,7 @@ class _ClientDashboardState extends State<ClientDashboard> {
 
     setState(() {
       sending = false;
+      _sentFileNames.add(fileName);
     });
     //Start the heartbeat check
     _startConnectionCheck();
@@ -267,7 +268,41 @@ class _ClientDashboardState extends State<ClientDashboard> {
     createConfirmDeleteDialogPopUp(context, () {
       setState(() {
         _fileData.remove(fileName);
+        _sentFileNames.remove(fileName);
       });
     });
+  }
+
+  void _changeConnectStatus(ConnectionStatus? status) {
+    switch (status) {
+      case ConnectionStatus.connecting:
+        setState(() {
+          _connectBtnIcon = const Icon(Icons.hourglass_bottom_rounded);
+          _connectBtnColor = lightGrey;
+          _connectBtnToolTip = "Attempting to Connect...";
+        });
+      case ConnectionStatus.connected:
+        setState(() {
+          clientConnected = !clientConnected;
+          _connectBtnIcon = const Icon(Icons.link_off);
+          _connectBtnColor = Colors.red;
+          _connectBtnToolTip = "Disconnect From Server";
+        });
+      case ConnectionStatus.disconnect:
+        setState(() {
+          clientConnected = false;
+          _client = null;
+          _connectBtnIcon = const Icon(Icons.link);
+          _connectBtnColor = darkGreen;
+          _fileData.clear();
+          _connectBtnToolTip = "Connect to Server";
+        });
+      default:
+        setState(() {
+          _connectBtnIcon = const Icon(Icons.link);
+          _connectBtnColor = darkGreen;
+          _connectBtnToolTip = "Connect to Server";
+        });
+    }
   }
 }
