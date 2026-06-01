@@ -120,7 +120,7 @@ class _NavigationState extends State<Navigation> {
 
   Widget mobileNavigation() {
     return SizedBox(
-      height: 85,
+      height: 110,
       child: BottomAppBar(
         color: flatBlack,
         child: BottomNavigationBar(

@@ -62,6 +62,8 @@ class _ServerDashboardState extends State<ServerDashboard> {
                 child: Text(
                   "Server running on IP: $_serverIP, Port: $_portInputServer",
                   selectionColor: background,
+                  overflow: TextOverflow.visible,
+                  softWrap: true,
                 ),
               ),
               centerTitle: true,
