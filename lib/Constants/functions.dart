@@ -66,11 +66,12 @@ Map decodeJsonMessage(String jsonString) {
 Future<String> getLocalIPV4() async {
   try {
     List<NetworkInterface> interfaces = await NetworkInterface.list(type: InternetAddressType.IPv4);
-
     for (var interface in interfaces) {
-      for (var address in interface.addresses) {
-        if (!address.isLoopback) {
-          return address.address;
+      if (!interface.name.toLowerCase().contains("vethernet")) {
+        for (var address in interface.addresses) {
+          if (!address.isLoopback) {
+            return address.address;
+          }
         }
       }
     }
