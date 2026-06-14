@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/foundation.dart';
 import 'package:path/path.dart' as p;
 
@@ -65,17 +66,33 @@ Map decodeJsonMessage(String jsonString) {
 
 Future<String> getLocalIPV4() async {
   try {
+    bool isRealDevice = true;
     List<NetworkInterface> interfaces = await NetworkInterface.list(type: InternetAddressType.IPv4);
-    for (var interface in interfaces) {
-      if (!interface.name.toLowerCase().contains("vethernet")) {
-        for (var address in interface.addresses) {
-          if (!address.isLoopback) {
-            return address.address;
+
+    DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+    if (Platform.isAndroid) {
+      AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
+      isRealDevice = androidInfo.isPhysicalDevice;
+    } else if (Platform.isIOS) {
+      IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
+      isRealDevice = iosInfo.isPhysicalDevice;
+    }
+
+    if (!isRealDevice) {
+      if (kDebugMode) print("Running on emulator...");
+      return InternetAddress.anyIPv4.address;
+    } else {
+      for (var interface in interfaces) {
+        if (!interface.name.toLowerCase().contains("vethernet")) {
+          for (var address in interface.addresses) {
+            if (!address.isLoopback) {
+              return address.address;
+            }
           }
         }
       }
+      return "";
     }
-    return "";
   } catch (e) {
     if (kDebugMode) {
       print("Error: $e");

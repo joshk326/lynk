@@ -222,6 +222,7 @@ class _ClientDashboardState extends State<ClientDashboard> {
 
     _changeConnectStatus(ConnectionStatus.disconnect);
     _stopConnectionCheck();
+    _sentFileNames.clear();
   }
 
   Future<void> _selectFile() async {
