@@ -64,3 +64,4 @@ Launch the app on two devices (or emulators) on the same local network. Use the 
 - ✅ ~~Persistent transfer history Server Side~~
 - ✅ ~~Save settings using SharedPrefs/json file~~
 - Web support (create websocket)
+- !IMPORTANT! Add file chunking for larger files
